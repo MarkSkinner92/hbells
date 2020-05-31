@@ -695,9 +695,9 @@ function search(keyterm){
   }
   else sorteddat = formatdat;
 }
-window.onblur = function() {
-    if(paused) _play();
-};
+// window.onblur = function() {
+//     if(paused) _play();
+// };
 //disable right click
 // document.addEventListener('contextmenu', function(e) {
 //   e.preventDefault();
