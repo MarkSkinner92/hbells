@@ -1,0 +1,134 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Handybells Music</title>
+  <link rel="icon" href="play/favicon.png" type="image/gif">
+  <link href="https://fonts.googleapis.com/css2?family=Manjari&display=swap" rel="stylesheet">
+  <style>
+    button {
+      background-color: #185162; /* Green */
+      border: none;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius:10px;
+    }
+    button::-moz-focus-inner {
+      border: 0;
+    }
+    #myVideo {
+      position: fixed;
+      right: 0;
+      top: 30%+60px;
+      min-width: 100%;
+      min-height: 100%;
+    }
+    .content {
+      position: fixed;
+      top: 30%+60px;
+      /* background: rgba(0, 0, 0, 0.5);
+      color: #f1f1f1; */
+      width: 100%;
+      padding: 20px;
+    }
+    #button2{
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      background-color:#7edf27;
+      text-decoration: none;
+      border-radius: 50px;
+      padding:12px 20px 8px;
+      margin-right: 20px;
+      font-size:32px;
+      color:white;
+      font-family: 'Manjari', sans-serif;
+    }
+    button:hover {
+      filter: brightness(85%);
+    }
+  </style>
+  <script>
+    function show(i){
+      hideall();
+      switch(i){
+        default:
+        case 0:
+          var elements = document.getElementsByClassName("home");
+          for(var i=0; i<elements.length; i++) {
+            elements[i].style.display = "block";
+          }
+        break;
+        case 1:
+          var elements = document.getElementsByClassName("about");
+          for(var i=0; i<elements.length; i++) {
+            elements[i].style.display = "block";
+          }
+        break;
+        case 2:
+          var elements = document.getElementsByClassName("contact");
+          for(var i=0; i<elements.length; i++) {
+            elements[i].style.display = "block";
+          }
+        break;
+      }
+    }
+    function hideall(){
+      var elements = document.getElementsByClassName("home");
+      for(var i=0; i<elements.length; i++) {
+        elements[i].style.display = "none";
+      }
+      var elements = document.getElementsByClassName("about");
+      for(var i=0; i<elements.length; i++) {
+        elements[i].style.display = "none";
+      }
+      var elements = document.getElementsByClassName("contact");
+      for(var i=0; i<elements.length; i++) {
+        elements[i].style.display = "none";
+      }
+    }
+  </script>
+</head>
+<body style="background-color:#f9faeb;padding:0px;margin:0px" onload="show(0)">
+  <div style="background-color:#185162; width:100%; height:30%;">
+    <h1 style="margin:0px;
+    padding:auto;color:white;
+    font-family: 'Manjari', sans-serif;
+    text-align: center;
+    font-size: 18vh;
+    padding-top: 2vh;
+    ">Handybells</h1>
+    <h1 style="margin:0px;
+    padding:auto;color:white;
+    font-family: 'Manjari', sans-serif;
+    text-align: center;
+    font-size: 5vmin;
+    padding-top: 0.5vh;
+    ">Providing interactive handbell music for friends and family!</h1>
+  </div>
+  <div style="background-color:#123947; width:100%; height:50px; text-align:center">
+    <button onclick="show(0);"style="padding:6px;margin:9px 3px">Home</button>
+    <button onclick="show(1);"style="padding:6px;margin:9px 3px">About</button>
+    <button onclick="show(2);"style="padding:6px;margin:9px 3px">Contact</button>
+  </div>
+  <!-- home -->
+    <video class="home" hode autoplay muted loop id="myVideo"><source src="res/placeholder.mov" type="video/mp4"></video>
+      <div class="home content" style="width:100%; text-align:center">
+      <a href="play.html" id='button2'>Play</a>
+      <a href="compose.html" id='button2'>Compose</a>
+    </div>
+
+  <!-- about -->
+  <h1 class="about" style="text-align:center;font-family: 'Manjari', sans-serif;">About</h1>
+  <h3 class="about" style="text-align:center;font-family: 'Manjari', sans-serif; margin:0px 40px">Our family got a mini handbell set, and we wanted an easy way to play music with our wide span of age and musical ability. I started this project 4 years ago when was 12 and after remaking it 5 times, I've learned a lot about what works and what doesn’t. Handybells is designed with you in mind. Every feature, button, and line is programmed to fill a specific need. If you use this website and find it useful, please consider supporting me. Money will go towards future software engineering tuition.</h3>
+  <image class="about" src='res/profile.png' style="width:160px;height:160px;margin:auto;padding-top: 30px">
+      <h3 class="about" style="text-align:center;font-family: 'Manjari', sans-serif; margin:10px 0px">Mark Skinner</h3>
+  <!-- support -->
+  <h1 class="contact" style="text-align:center;font-family: 'Manjari', sans-serif;">Contact Me</h1>
+  <h3 class="contact" style="text-align:center;font-family: 'Manjari', sans-serif; margin:0px 40px">Questions? Comments? Concerns? I would love to hear from you!</h3>
+  <image class="contact" src='res/email.png' style='margin:auto; padding-top:25px'>
+
+</body>
+</html>
