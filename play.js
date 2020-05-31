@@ -22,14 +22,14 @@ let codepanel, getcode, ok, cancel, code;
 let permited = false, justwaitforoneclick = false;
 p5.disableFriendlyErrors = true;
 function preload(){//-160 x
-  hitimg = loadImage('play/guide.png');
-  barA = loadImage('play/_barA.png');
-  soundssort = loadImage('play/_soundssort.png');
-  selector = loadImage('play/_selector.png');
-  libmain = loadImage('play/lib/main.png');
-  dat = loadStrings('play/lib/dat.txt');
-  libbanner = loadImage('play/banner.png');
-  codepanel = loadImage('play/_codewindow.png');
+  hitimg = loadImage('playRes/guide.png');
+  barA = loadImage('playRes/_barA.png');
+  soundssort = loadImage('playRes/_soundssort.png');
+  selector = loadImage('playRes/_selector.png');
+  libmain = loadImage('playRes/lib/main.png');
+  dat = loadStrings('playRes/lib/dat.txt');
+  libbanner = loadImage('playRes/banner.png');
+  codepanel = loadImage('playRes/_codewindow.png');
   // bkimg = loadImage('bkgimg.png');
 }
 function setup() {
@@ -41,33 +41,33 @@ function setup() {
   songinput.size(96,30);
   songinput.id('file-input');
   songinput.hide();
-  songbank = createImg('play/_library.png');
+  songbank = createImg('playRes/_library.png');
   songbank.position(12,10);
   songbank.mousePressed(openSongBank);
-  play = createImg('play/_play.png');
+  play = createImg('playRes/_play.png');
   play.position(137,20);
   play.mousePressed(_play);
-  stop = createImg('play/_stop.png');
+  stop = createImg('playRes/_stop.png');
   stop.position(182,20);
   stop.mousePressed(_stop);
   barinput = createInput();
   barinput.size(40,26);
   barinput.position(265,41);
   barinput.value(1);
-  barM = createImg('play/_minus.png');
+  barM = createImg('playRes/_minus.png');
   barM.position(249,45);
   barM.mousePressed(_barM);
-  barP = createImg('play/_plus.png');
+  barP = createImg('playRes/_plus.png');
   barP.position(306,46);
   barP.mousePressed(_barP);
   tempoinput = createInput();
   tempoinput.position(360,41);
   tempoinput.size(47,26);
   tempoinput.value(100);
-  tempoM = createImg('play/_minus.png');
+  tempoM = createImg('playRes/_minus.png');
   tempoM.position(344,45);
   tempoM.mousePressed(_tempoM);
-  tempoP = createImg('play/_plus.png');
+  tempoP = createImg('playRes/_plus.png');
   tempoP.position(409,46);
   tempoP.mousePressed(_tempoP);
   transposeinput = createInput();
@@ -75,13 +75,13 @@ function setup() {
   transposeinput.position(467,41);
   transposeinput.value(0);
   transposeinput.input(updatetranspose);
-  transM = createImg('play/_minus.png');
+  transM = createImg('playRes/_minus.png');
   transM.position(450,45);
   transM.mousePressed(_transM);
-  transP = createImg('play/_plus.png');
+  transP = createImg('playRes/_plus.png');
   transP.position(507,46);
   transP.mousePressed(_transP);
-  playsounds = createImg('play/_toggleOn.png');
+  playsounds = createImg('playRes/_toggleOn.png');
   playsounds.position(549,42);
   playsounds.mousePressed(soundscheck);
   viewmode = createSelect();
@@ -97,32 +97,32 @@ function setup() {
   colormode.option('8 note set');
   colormode.option('No Colour');
   colormode.changed(colorchange);
-  home = createImg('play/_home.png');
+  home = createImg('playRes/_home.png');
   home.position(windowWidth-67,14);
   home.parent('homeparent');
   libsearch = createInput();
   libsearch.input(searchEvent);
   libbells = createInput();
   libbells.input(searchBellEvent);
-  libM = createImg('play/_minus.png');
-  libP = createImg('play/_plus.png');
-  libonoff = createImg('play/lib/off.png');
+  libM = createImg('playRes/_minus.png');
+  libP = createImg('playRes/_plus.png');
+  libonoff = createImg('playRes/lib/off.png');
   libonoff.mousePressed(toggleDiatonic);
-  left = createImg('play/lib/left.png');
+  left = createImg('playRes/lib/left.png');
   left.mousePressed(_left);
-  right = createImg('play/lib/right.png');
+  right = createImg('playRes/lib/right.png');
   right.mousePressed(_right);
-  entercode = createImg('play/lib/entercode.png');
+  entercode = createImg('playRes/lib/entercode.png');
   entercode.mousePressed(toggleCode);
-  libcancel = createImg('play/_cancel.png');
+  libcancel = createImg('playRes/_cancel.png');
   libcancel.mousePressed(hideLibrary);
 
   //enter code menu (incomplete)
-  getcode = createImg('play/_getcode.png');
+  getcode = createImg('playRes/_getcode.png');
   getcode.parent('getcodeparent');
-  ok = createImg('play/_ok.png');
+  ok = createImg('playRes/_ok.png');
   ok.mousePressed(okCode);
-  cancel = createImg('play/_cancel.png');
+  cancel = createImg('playRes/_cancel.png');
   cancel.mousePressed(cancelCode);
   code = createInput();
   code.attribute('type','password');
@@ -132,7 +132,7 @@ function setup() {
     formatdat[i] = {name:s[0],premium:(s[1]=='true'),bells:s[2],diatonic:s[3]};
   }
   hitx = windowWidth*0.83;
-  currentsongdata = loadStrings('play/lib/songs/London_Bridge.txt', callbackloadfile);
+  currentsongdata = loadStrings('playRes/lib/songs/London_Bridge.txt', callbackloadfile);
   sorteddat = formatdat;
 }
 function draw() {
@@ -263,7 +263,7 @@ function callbackloadfile(){
 }
 function mouseOverTile(x,y,obj){
   if(mouseX > x && mouseX < x+296 && mouseY > y && mouseY < y+107 && !(obj.premium && !permited)){
-    currentsongdata = loadStrings('play/lib/songs/'+(obj.name.replace(/ /g, '_'))+'.txt', callbackloadfile);
+    currentsongdata = loadStrings('playRes/lib/songs/'+(obj.name.replace(/ /g, '_'))+'.txt', callbackloadfile);
     hideLibrary();
   }
 }
@@ -439,8 +439,8 @@ function _play(){
       playbackbar = barinput.value()-1;
     }
     paused = !paused;
-    if(paused) play.attribute('src', 'play/_pause.png');
-    else play.attribute('src', 'play/_play.png');
+    if(paused) play.attribute('src', 'playRes/_pause.png');
+    else play.attribute('src', 'playRes/_play.png');
   }
 }
 function _stop(){
@@ -452,7 +452,7 @@ function _stop(){
   playbackbeat = 0;
   barinput.value(1);
   paused = false;
-  play.attribute('src', 'play/_play.png');
+  play.attribute('src', 'playRes/_play.png');
   barlinepos = [];
 }
 function mouseInRect(a,b,c,d){
@@ -461,8 +461,8 @@ function mouseInRect(a,b,c,d){
 }
 function soundscheck() {
   playsound = !playsound;
-  if(playsound) playsounds.attribute('src', 'play/_toggleOn.png');
-  else playsounds.attribute('src', 'play/_toggleOff.png');
+  if(playsound) playsounds.attribute('src', 'playRes/_toggleOn.png');
+  else playsounds.attribute('src', 'playRes/_toggleOff.png');
 }
 function updatetranspose(){
   if(transposeinput.value() != '' && transposeinput.value() != '-'){
@@ -591,8 +591,8 @@ function toggleDiatonic(){
   diatonicsearch();
 }
 function updateDlever(){
-  if(searchdiatonic) libonoff.attribute('src','play/lib/on.png');
-  else libonoff.attribute('src','play/lib/off.png');
+  if(searchdiatonic) libonoff.attribute('src','playRes/lib/on.png');
+  else libonoff.attribute('src','playRes/lib/off.png');
 }
 function toggleCode(){
   hideLibrary();

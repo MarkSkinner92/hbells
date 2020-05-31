@@ -22,38 +22,14 @@ let codepanel, prompt, showprompt = false;
 
 var nv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 function preload(){
-  panel = loadImage('compose/_panel.png');
-  codepanel = loadImage('compose/_codewindow.png');
-  playhead=loadImage('compose/arrow.png');
-  settingsimg = loadImage('compose/_settings.png');
-  tempoM = createImg('compose/_minus.png');
-  tempoP = createImg('compose/_plus.png');
-  barM = createImg('compose/_minus.png');
-  barP = createImg('compose/_plus.png');
-  download = createImg('compose/_savefile.png');
-  play = createImg('compose/_play.png');
-  left = createImg('compose/_left.png');
-  right = createImg('compose/_right.png');
-  up = createImg('compose/_up.png');
-  down = createImg('compose/_down.png');
-  opensettings = createImg('compose/_opensettings.png');
-  smok = createImg('compose/_apply.png');
-  smcancel = createImg('compose/_cancel.png');
-  barsM = createImg('compose/_minus.png');
-  barsP = createImg('compose/_plus.png');
-  pickupsM = createImg('compose/_minus.png');
-  pickupsP = createImg('compose/_plus.png');
-  clear = createImg('compose/_clear.png');
-  code = createImg('compose/_entercode.png');
-  home = createImg('compose/_home.png');
-  ok = createImg('compose/_ok.png');
-  cancel = createImg('compose/_cancel.png');
-  getcode = createImg('compose/_getcode.png');
-  prompt = loadImage('compose/removelimit.png');
+  panel = loadImage('composeRes/_panel.png');
+  codepanel = loadImage('composeRes/_codewindow.png');
+  playhead=loadImage('composeRes/arrow.png');
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
   for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+nv[i]+'.wav');
+  settingsimg = loadImage('composeRes/_settings.png');
   nameinput = createInput();
   nameinput.position(313,354);
   nameinput.size(216,31);
@@ -63,65 +39,88 @@ function setup() {
   tempoinput.size(40,26);
   nameinput.size(195,31);
   tempoinput.value(100);
+  tempoM = createImg('composeRes/_minus.png');
   tempoM.position(363,41);
   tempoM.mousePressed(_tempoM);
+  tempoP = createImg('composeRes/_plus.png');
   tempoP.position(417,42);
   tempoP.mousePressed(_tempoP);
   backbar = createInput();
   backbar.position(291,36);
   backbar.size(36,25);
   backbar.value(1);
+  barM = createImg('composeRes/_minus.png');
   barM.position(275,41);
   barM.mousePressed(_barM);
+  barP = createImg('composeRes/_plus.png');
   barP.position(328,42);
   barP.mousePressed(_barP);
   upload = createFileInput(BigU);
   upload.position(11, 41);
   upload.id('file-input');
   upload.hide();
-
+  download = createImg('composeRes/_savefile.png');
   download.position(12,10);
   download.mousePressed(BigD);
+  play = createImg('composeRes/_play.png');
   play.position(122,21);
   play.mousePressed(_play);
+  left = createImg('composeRes/_left.png');
   left.position(170,21);
   left.mousePressed(shiftleft);
+  right = createImg('composeRes/_right.png');
   right.position(215,21);
   right.mousePressed(shiftright);
+  up = createImg('composeRes/_up.png');
   up.position(459,35);
   up.mousePressed(transposeUp);
+  down = createImg('composeRes/_down.png');
   down.position(502,35);
   down.mousePressed(transposeDown);
+  opensettings = createImg('composeRes/_opensettings.png');
   opensettings.position(580,42);
   opensettings.mousePressed(toggleSettings);
+  smok = createImg('composeRes/_apply.png');
   smok.mousePressed(_smok);
+  smcancel = createImg('composeRes/_cancel.png');
   smcancel.mousePressed(_smcancel);
   bars = createInput();
   pickups = createInput();
   bars.size(39,29);
   pickups.size(39,29);
+  barsM = createImg('composeRes/_minus.png');
   barsM.mousePressed(_pickupsM);
+  barsP = createImg('composeRes/_plus.png');
   barsP.mousePressed(_pickupsP);
   bars.value(4);
+  pickupsM = createImg('composeRes/_minus.png');
   pickupsM.mousePressed(_barsM);
+  pickupsP = createImg('composeRes/_plus.png');
   pickupsP.mousePressed(_barsP);
   pickups.value(4);
   nameinput.value("new song");
+  clear = createImg('composeRes/_clear.png');
   clear.position(746,42);
   clear.mousePressed(deleteAllNotes);
 
   faketimesig = Object.assign({}, timesig);
 
+  code = createImg('composeRes/_entercode.png');
   code.position(580, 8);
   code.mousePressed(toggleCode);
+  home = createImg('composeRes/_home.png');
   home.position(windowWidth-67,14);
   home.parent('homeparent');
 
+  ok = createImg('composeRes/_ok.png');
   ok.mousePressed(okCode);
+  cancel = createImg('composeRes/_cancel.png');
   cancel.mousePressed(cancelCode);
+  getcode = createImg('composeRes/_getcode.png');
   getcode.parent('getcodeparent');
   entercode = createInput();
   entercode.attribute('type','password');
+  prompt = loadImage('composeRes/removelimit.png');
   hideSettings();
   hideCode();
 }
@@ -372,13 +371,13 @@ function _play(){
       backbar.value(1);
       playbackbeat = 0;
       playbacktime = 0;
-      play.attribute('src', 'compose/_play.png');
+      play.attribute('src', 'composeRes/_play.png');
     }
     else{
       playback = true;
       playbackbar = backbar.value()-1;
       playbackbeat = 0;
-      play.attribute('src', 'compose/_stop.png');
+      play.attribute('src', 'composeRes/_stop.png');
     }
   }
 }
