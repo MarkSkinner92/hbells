@@ -23,13 +23,13 @@ let permited = false, justwaitforoneclick = false;
 p5.disableFriendlyErrors = true;
 function preload(){//-160 x
   hitimg = loadImage('playRes/guide.png');
-  barA = loadImage('playRes/_barA.png');
-  soundssort = loadImage('playRes/_soundssort.png');
-  selector = loadImage('playRes/_selector.png');
+  barA = loadImage('playRes/barA.png');
+  soundssort = loadImage('playRes/soundssort.png');
+  selector = loadImage('playRes/selector.png');
   libmain = loadImage('playRes/lib/main.png');
   dat = loadStrings('playRes/lib/dat.txt');
   libbanner = loadImage('playRes/banner.png');
-  codepanel = loadImage('playRes/_codewindow.png');
+  codepanel = loadImage('playRes/codewindow.png');
   // bkimg = loadImage('bkgimg.png');
 }
 function setup() {
@@ -41,33 +41,33 @@ function setup() {
   songinput.size(96,30);
   songinput.id('file-input');
   songinput.hide();
-  songbank = createImg('playRes/_library.png');
+  songbank = createImg('playRes/library.png');
   songbank.position(12,10);
   songbank.mousePressed(openSongBank);
-  play = createImg('playRes/_play.png');
+  play = createImg('playRes/play.png');
   play.position(137,20);
   play.mousePressed(_play);
-  stop = createImg('playRes/_stop.png');
+  stop = createImg('playRes/stop.png');
   stop.position(182,20);
   stop.mousePressed(_stop);
   barinput = createInput();
   barinput.size(40,26);
   barinput.position(265,41);
   barinput.value(1);
-  barM = createImg('playRes/_minus.png');
+  barM = createImg('playRes/minus.png');
   barM.position(249,45);
   barM.mousePressed(_barM);
-  barP = createImg('playRes/_plus.png');
+  barP = createImg('playRes/plus.png');
   barP.position(306,46);
   barP.mousePressed(_barP);
   tempoinput = createInput();
   tempoinput.position(360,41);
   tempoinput.size(47,26);
   tempoinput.value(100);
-  tempoM = createImg('playRes/_minus.png');
+  tempoM = createImg('playRes/minus.png');
   tempoM.position(344,45);
   tempoM.mousePressed(_tempoM);
-  tempoP = createImg('playRes/_plus.png');
+  tempoP = createImg('playRes/plus.png');
   tempoP.position(409,46);
   tempoP.mousePressed(_tempoP);
   transposeinput = createInput();
@@ -75,13 +75,13 @@ function setup() {
   transposeinput.position(467,41);
   transposeinput.value(0);
   transposeinput.input(updatetranspose);
-  transM = createImg('playRes/_minus.png');
+  transM = createImg('playRes/minus.png');
   transM.position(450,45);
   transM.mousePressed(_transM);
-  transP = createImg('playRes/_plus.png');
+  transP = createImg('playRes/plus.png');
   transP.position(507,46);
   transP.mousePressed(_transP);
-  playsounds = createImg('playRes/_toggleOn.png');
+  playsounds = createImg('playRes/toggleOn.png');
   playsounds.position(549,42);
   playsounds.mousePressed(soundscheck);
   viewmode = createSelect();
@@ -97,15 +97,15 @@ function setup() {
   colormode.option('8 note set');
   colormode.option('No Colour');
   colormode.changed(colorchange);
-  home = createImg('playRes/_home.png');
+  home = createImg('playRes/home.png');
   home.position(windowWidth-67,14);
   home.parent('homeparent');
   libsearch = createInput();
   libsearch.input(searchEvent);
   libbells = createInput();
   libbells.input(searchBellEvent);
-  libM = createImg('playRes/_minus.png');
-  libP = createImg('playRes/_plus.png');
+  libM = createImg('playRes/minus.png');
+  libP = createImg('playRes/plus.png');
   libonoff = createImg('playRes/lib/off.png');
   libonoff.mousePressed(toggleDiatonic);
   left = createImg('playRes/lib/left.png');
@@ -114,15 +114,15 @@ function setup() {
   right.mousePressed(_right);
   entercode = createImg('playRes/lib/entercode.png');
   entercode.mousePressed(toggleCode);
-  libcancel = createImg('playRes/_cancel.png');
+  libcancel = createImg('playRes/cancel.png');
   libcancel.mousePressed(hideLibrary);
 
   //enter code menu (incomplete)
-  getcode = createImg('playRes/_getcode.png');
+  getcode = createImg('playRes/getcode.png');
   getcode.parent('getcodeparent');
-  ok = createImg('playRes/_ok.png');
+  ok = createImg('playRes/ok.png');
   ok.mousePressed(okCode);
-  cancel = createImg('playRes/_cancel.png');
+  cancel = createImg('playRes/cancel.png');
   cancel.mousePressed(cancelCode);
   code = createInput();
   code.attribute('type','password');
@@ -439,8 +439,8 @@ function _play(){
       playbackbar = barinput.value()-1;
     }
     paused = !paused;
-    if(paused) play.attribute('src', 'playRes/_pause.png');
-    else play.attribute('src', 'playRes/_play.png');
+    if(paused) play.attribute('src', 'playRes/pause.png');
+    else play.attribute('src', 'playRes/play.png');
   }
 }
 function _stop(){
@@ -452,7 +452,7 @@ function _stop(){
   playbackbeat = 0;
   barinput.value(1);
   paused = false;
-  play.attribute('src', 'playRes/_play.png');
+  play.attribute('src', 'playRes/play.png');
   barlinepos = [];
 }
 function mouseInRect(a,b,c,d){
@@ -461,8 +461,8 @@ function mouseInRect(a,b,c,d){
 }
 function soundscheck() {
   playsound = !playsound;
-  if(playsound) playsounds.attribute('src', 'playRes/_toggleOn.png');
-  else playsounds.attribute('src', 'playRes/_toggleOff.png');
+  if(playsound) playsounds.attribute('src', 'playRes/toggleOn.png');
+  else playsounds.attribute('src', 'playRes/toggleOff.png');
 }
 function updatetranspose(){
   if(transposeinput.value() != '' && transposeinput.value() != '-'){
