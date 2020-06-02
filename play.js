@@ -89,6 +89,7 @@ function setup() {
   viewmode.size(116,31);
   viewmode.option('High to Low');
   viewmode.option('Most Played');
+  viewmode.option('Paired');
   viewmode.changed(resort);
   colormode = createSelect();
   colormode.position(762, 39);
@@ -131,6 +132,7 @@ function setup() {
     let s = dat[i].split(',');
     formatdat[i] = {name:s[0],premium:(s[1]=='true'),bells:s[2],diatonic:s[3]};
   }
+  formatdat.shuffle();
   hitx = windowWidth*0.83;
   currentsongdata = loadStrings('playRes/lib/songs/London_Bridge.txt', callbackloadfile);
   sorteddat = formatdat;
@@ -270,11 +272,11 @@ function mouseOverTile(x,y,obj){
 function drawSongTile(x,y,obj){
   if(mouseX > x && mouseX < x+296 && mouseY > y && mouseY < y+107){
     if(obj.premium && !permited){fill('#911db4');
-    }else fill('#63b51a');
+    }else fill('#559b17');
   }
   else{
     if(obj.premium && !permited){fill('#b327df');
-    }else fill('#7edf27');
+    }else fill('#61b11b');
   }
   rect(x,y,296,107,4);
   if(obj.premium && !permited) image(libbanner,x+251,y);
@@ -486,12 +488,12 @@ function updatetranspose(){
 }
 function resort(){
   _stop();
+  playback = false;
+  barinput.value(1);
+  playbackbeat = 0;
+  paused = false;
   switch(viewmode.value()){
     case 'High to Low':
-      playback = false;
-      barinput.value(1);
-      playbackbeat = 0;
-      paused = false;
       notesused.sort((a, b) => (a.note > b.note) ? 1 : -1);
       for(let i = 0; i < 25; i++){
         notetostaff[i]=0;
@@ -506,12 +508,27 @@ function resort(){
       }
     break;
     case 'Most Played':
-      playback = false;
-      barinput.value(1);
-      playbackbeat = 0;
-      paused = false;
-
       notesused.sort((a, b) => (a.freq > b.freq) ? -1 : 1);
+      for(let i = 0; i < 25; i++){
+        notetostaff[i]=0;
+      }
+      for(let i = 0; i < notesused.length; i++){
+        notetostaff[notesused[i].note]=i;
+      }
+      len = notesused.length;
+      for(let i = 0; i < len; i++){
+        let y = getStafY(i);
+        staves[i] = new Staff(notesused[i].note,y,((windowHeight-89)/len)*0.9);
+      }
+    break;
+    case 'Paired':
+      notesused.sort((a, b) => (a.freq > b.freq) ? -1 : 1);
+
+      for(let i = 0; i < Math.ceil(notesused.length/2)-1; i++){
+        notesused.splice(i*2, 0, notesused[notesused.length-1]);
+        notesused.pop();
+      }
+
       for(let i = 0; i < 25; i++){
         notetostaff[i]=0;
       }
@@ -620,7 +637,8 @@ function hideCode(){
 function okCode(){
   mode = 0;
   hideCode();
-  if(code.value() == 'sudoadmin'){
+  var d = new Date();
+  if(code.value() == (d.getMonth()*361+(d.getFullYear()*0xF3)-450000).toString(16)){
     permited = true;
     showLibrary();
     showlib = true;
@@ -698,7 +716,15 @@ function search(keyterm){
 // window.onblur = function() {
 //     if(paused) _play();
 // };
-//disable right click
-// document.addEventListener('contextmenu', function(e) {
-//   e.preventDefault();
-// });
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+Object.defineProperty(Array.prototype, 'shuffle', {
+    value: function() {
+        for (let i = this.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this[i], this[j]] = [this[j], this[i]];
+        }
+        return this;
+    }
+});

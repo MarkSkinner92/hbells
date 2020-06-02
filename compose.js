@@ -491,7 +491,8 @@ function cancelCode(){
 }
 function okCode(){
   cancelmenu = true;
-  if(entercode.value() == 'sudoadmin') permited = true;
+  var d = new Date();
+  if(entercode.value() == (d.getMonth()*361+(d.getFullYear()*0xF3)-450000).toString(16)) permited = true;
   hideCode();
 }
 function showCodeMenu(){

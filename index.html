@@ -22,10 +22,11 @@
     }
     #myVideo {
       position: fixed;
-      right: 0;
-      top: 30%+60px;
+      left: -120px;
+      top: 30%+50px;
       min-width: 100%;
       min-height: 100%;
+      width: 120%;
     }
     .content {
       position: fixed;
@@ -34,6 +35,9 @@
       color: #f1f1f1; */
       width: 100%;
       padding: 20px;
+    }
+    .about, .contact{
+      display: none;
     }
     #button2{
       box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
@@ -114,7 +118,7 @@
     <button onclick="show(2);"style="padding:6px;margin:9px 3px">Contact</button>
   </div>
   <!-- home -->
-    <video class="home" hode autoplay muted loop id="myVideo"><source src="res/placeholder.mov" type="video/mp4"></video>
+    <video class="home" hode autoplay muted loop id="myVideo"><source src="res/background.webm" type="video/mp4"></video>
       <div class="home content" style="width:100%; text-align:center">
       <a href="play.html" id='button2'>Play</a>
       <a href="compose.html" id='button2'>Compose</a>
