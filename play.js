@@ -313,6 +313,10 @@ function styleSettings(){
     home.hide();
   }
   else home.show();
+  if(windowWidth < 629 || windowHeight < 492){
+    document.getElementById('disab').style.display = 'block';
+  }
+  else document.getElementById('disab').style.display = 'none';
 }
 function getFile(file){
   loadSong(file.data.split('\n'));
