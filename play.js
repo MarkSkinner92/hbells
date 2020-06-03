@@ -13,6 +13,7 @@ let songinthehouse = false;
 var timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
 var onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 var nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
+let songinfo;
 // let bkimg;
 //library elements
 let showlib = true, libmain, libbanner, libsearch, libP, libM, libonoff, left, right, entercode, libcancel,currentsongdata,dat=[], formatdat = [];
@@ -133,17 +134,21 @@ function setup() {
     formatdat[i] = {name:s[0],premium:(s[1]=='true'),bells:s[2],diatonic:s[3]};
   }
   formatdat.shuffle();
+  let y = formatdat.findIndex(isfree);
+  var b = formatdat[y];
+  formatdat[y] = formatdat[0];
+  formatdat[0] = b;
   hitx = windowWidth*0.83;
   currentsongdata = loadStrings('playRes/lib/songs/London_Bridge.txt', callbackloadfile);
   sorteddat = formatdat;
+  songinfo = document.getElementById('songinfo');
+  styleSettings();
+}
+function isfree(ob){
+  return !ob.premium;
 }
 function draw() {
   background('#f9faeb');
-  // if(!songinthehouse) for(let x = 0; x < windowWidth/bkimg.width; x++){
-  //   for(let y = 0; y < windowHeight/bkimg.height; y++){
-  //     image(bkimg,x*bkimg.width,y*bkimg.height);
-  //   }
-  // }
   noStroke();
   //playback
   if(paused){
@@ -296,6 +301,18 @@ function windowResized() {
     staves[i].s = ((windowHeight-89)/(notesused.length))*0.9;
   }
   home.position(windowWidth-67,14);
+  styleSettings();
+}
+function styleSettings(){
+  songinfo.style.left = hitx - songinfo.offsetWidth/2;
+  if(windowWidth < 1145){
+    songinfo.style.display = 'none';
+  }
+  else songinfo.style.display = 'block';
+  if(windowWidth < 956){
+    home.hide();
+  }
+  else home.show();
 }
 function getFile(file){
   loadSong(file.data.split('\n'));
@@ -339,6 +356,7 @@ function loadSong(data){
   playbackbeat = 0;
   paused = false;
   songinthehouse = true;
+  document.getElementById("songinfo").innerHTML = timesig.name + ', '+notesused.length + ' bells';
   resort();
 }
 function getStafY(i){
