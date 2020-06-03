@@ -1,16 +1,16 @@
-Ants Go Marching,false,8,false
+Ants Go Marching,true,8,false
 Happy Birthday,true,8,false
 If Your Happy And You Know It,true,7,false
 I'm A Little Tea Pot,false,7,true
 Itsy Bitsy Spider,false,7,false
-Little Brown Jug,trye,11,false
-London Bridge,trye,6,true
+Little Brown Jug,true,11,false
+London Bridge,true,6,true
 Row Row Row Your Boat,true,6,true
 Take Me To The Ball Game,false,9,false
 The Wheels On The Bus,false,7,true
 Twinkle Twinkle Little Star,true,6,true
 When The Saints,true,5,true
-Yankee Doodle,false,9,false
+Yankee Doodle,true,9,false
 Joy To The World,false,8,false
 Ring Around The Rosie,false,5,true
-Good King Wenceslas,false,8,false
+Good King Wenceslas,true,8,false
