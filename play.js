@@ -43,64 +43,64 @@ function setup() {
   songinput.id('file-input');
   songinput.hide();
   songbank = createImg('playRes/library.png');
-  songbank.position(12,10);
+  songbank.position(79,10);
   songbank.mousePressed(openSongBank);
   play = createImg('playRes/play.png');
-  play.position(137,20);
+  play.position(178,20);
   play.mousePressed(_play);
   stop = createImg('playRes/stop.png');
-  stop.position(182,20);
+  stop.position(226,20);
   stop.mousePressed(_stop);
   barinput = createInput();
   barinput.size(40,26);
-  barinput.position(265,41);
+  barinput.position(290,41);
   barinput.value(1);
   barM = createImg('playRes/minus.png');
-  barM.position(249,45);
+  barM.position(274,45);
   barM.mousePressed(_barM);
   barP = createImg('playRes/plus.png');
-  barP.position(306,46);
+  barP.position(331,46);
   barP.mousePressed(_barP);
   tempoinput = createInput();
-  tempoinput.position(360,41);
+  tempoinput.position(385,41);
   tempoinput.size(47,26);
   tempoinput.value(100);
   tempoM = createImg('playRes/minus.png');
-  tempoM.position(344,45);
+  tempoM.position(369,45);
   tempoM.mousePressed(_tempoM);
   tempoP = createImg('playRes/plus.png');
-  tempoP.position(409,46);
+  tempoP.position(434,46);
   tempoP.mousePressed(_tempoP);
   transposeinput = createInput();
   transposeinput.size(37,26);
-  transposeinput.position(467,41);
+  transposeinput.position(492,41);
   transposeinput.value(0);
   transposeinput.input(updatetranspose);
   transM = createImg('playRes/minus.png');
-  transM.position(450,45);
+  transM.position(475,45);
   transM.mousePressed(_transM);
   transP = createImg('playRes/plus.png');
-  transP.position(507,46);
+  transP.position(532,46);
   transP.mousePressed(_transP);
   playsounds = createImg('playRes/toggleOn.png');
-  playsounds.position(549,42);
+  playsounds.position(574,42);
   playsounds.mousePressed(soundscheck);
   viewmode = createSelect();
-  viewmode.position(621, 39);
+  viewmode.position(646, 39);
   viewmode.size(116,31);
   viewmode.option('High to Low');
   viewmode.option('Most Played');
   viewmode.option('Paired');
   viewmode.changed(resort);
   colormode = createSelect();
-  colormode.position(762, 39);
+  colormode.position(787, 39);
   colormode.size(116,31);
   colormode.option('Random');
   colormode.option('8 note set');
   colormode.option('No Colour');
   colormode.changed(colorchange);
   home = createImg('playRes/home.png');
-  home.position(windowWidth-67,14);
+  home.position(12,14);
   home.parent('homeparent');
   libsearch = createInput();
   libsearch.input(searchEvent);
@@ -183,10 +183,10 @@ function draw() {
   fill('#185162');
   rect(0,0,windowWidth,81);
   rect(0,windowHeight-13,windowWidth,13);
-  image(barA,246,16);
-  image(soundssort,551,18);
-  image(selector,617,37);
-  image(selector,758,37);
+  image(barA,271,16);
+  image(soundssort,576,18);
+  image(selector,642,37);
+  image(selector,783,37);
   //draw staves
   if(paused){
     stroke('#c5c56c');
@@ -300,19 +300,13 @@ function windowResized() {
     staves[i].y = y;
     staves[i].s = ((windowHeight-89)/(notesused.length))*0.9;
   }
-  home.position(windowWidth-67,14);
   styleSettings();
 }
 function styleSettings(){
-  songinfo.style.left = hitx - songinfo.offsetWidth/2;
-  if(windowWidth < 1145){
+  if(hitx < 907){
     songinfo.style.display = 'none';
   }
   else songinfo.style.display = 'block';
-  if(windowWidth < 956){
-    home.hide();
-  }
-  else home.show();
   if(windowWidth < 629 || windowHeight < 492){
     document.getElementById('disab').style.display = 'block';
   }
