@@ -153,7 +153,7 @@ function draw() {
   }
   lasttime = millis();
 
-  background('#FFF3c5');
+  background('#fffdf2');
   noStroke();
   fill('#185162');
   rect(0,0,windowWidth,81);
