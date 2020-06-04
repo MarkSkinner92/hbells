@@ -12,21 +12,13 @@
       color: white;
       text-align: center;
       text-decoration: none;
-      display: inline-block;
+      /* display: inline-block; */
       font-size: 16px;
       cursor: pointer;
       border-radius:10px;
     }
     button::-moz-focus-inner {
       border: 0;
-    }
-    #myBackground {
-      position: fixed;
-      left: -120px;
-      top: 30%+50px;
-      min-width: 100%;
-      min-height: 100%;
-      width: 120%;
     }
     .content {
       position: fixed;
@@ -35,20 +27,25 @@
       color: #f1f1f1; */
       width: 100%;
       padding: 20px;
+      text-align: center;
     }
     .about, .contact{
       display: none;
     }
+    .home{
+      overflow: hidden;
+    }
     #button2{
-      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.6);
       background-color:#7edf27;
       text-decoration: none;
       border-radius: 50px;
       padding:12px 20px 8px;
-      margin-right: 20px;
+      margin: 10px;
       font-size:32px;
       color:white;
       font-family: 'Manjari', sans-serif;
+      position: relative;
     }
     button:hover {
       filter: brightness(85%);
@@ -101,7 +98,7 @@
     padding:auto;color:white;
     font-family: 'Manjari', sans-serif;
     text-align: center;
-    font-size: 18vh;
+    font-size: 16vmin;
     padding-top: 2vh;
     ">Handybells</h1>
     <h1 style="margin:0px;
@@ -118,10 +115,11 @@
     <button onclick="show(2);"style="padding:6px;margin:9px 3px">Contact</button>
   </div>
   <!-- home -->
-    <img class="home" id="myBackground" src="res/background.jpg">
-      <div class="home content" style="width:100%; text-align:center">
-      <a href="play.html" id='button2'>Play</a>
-      <a href="compose.html" id='button2'>Compose</a>
+    <img class="home" src="res/background.jpg" style="position:fixed;height:100%;z-index:-1;top:150px">
+</div>
+      <div class="home content" style="width:100%; height:300px; text-align:center; padding:0px">
+      <a href="play.html" id='button2' style="line-height:100px">Play</a>
+      <a href="compose.html" id='button2'style="line-height:45px">Compose</a>
     </div>
 
   <!-- about -->

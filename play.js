@@ -383,6 +383,7 @@ class Staff {
     this.s = s;
     this.notes = [];//holds ticks
     this.c = redocolor(this.p);
+    this.deleteme = false;
   }
   display() {
     strokeWeight(3);
@@ -406,7 +407,7 @@ class Staff {
   tick(){
     let n = this.p;
     let length = this.notes.length;
-    for(let i = 0; i < length; i++){
+    for(let i = length-1; i >= 0; i--){
       this.notes[i]+=tickrate;
     }
     if(this.notes[length-1] >= hitx){

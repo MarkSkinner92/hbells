@@ -5,8 +5,8 @@
   <link rel="icon" href="favicon.png" type="image/gif">
   <title>Handybells Compose</title>
   <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
-  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="libraries/p5.sound.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/addons/p5.sound.min.js"></script>
   <script language="javascript" type="text/javascript" src="compose.js"></script>
   <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
 
@@ -25,7 +25,7 @@
 </style>
 </head>
 
-<body>
+<body style="overflow:hidden">
   <div class="image-upload">
   <label for="file-input">
     <img src="composeRes/openfile.png" style="position: absolute;
@@ -35,6 +35,24 @@
 </div>
 <a target="_blank" id = 'getcodeparent' href="https://www.patreon.com/handybells?fan_landing=true">
     <a id = 'homeparent' href="index.html">
-</a>
+</a></a>
+<div id="disab" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index:99;
+    display: none;
+    background-color:rgba(0,0,0,0.7)">
+    <h1 style="color:white; text-align:center;
+    margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+    "> Screen size too small for intended purpose</h1>
+  </div>
 </body>
 </html>

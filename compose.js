@@ -123,6 +123,7 @@ function setup() {
   prompt = loadImage('composeRes/removelimit.png');
   hideSettings();
   hideCode();
+  styleSettings();
 }
 
 function draw() {
@@ -269,8 +270,18 @@ function draw() {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   home.position(windowWidth-67,14);
+  styleSettings();
 }
-
+function styleSettings(){
+  if(windowWidth < 956){
+    home.hide();
+  }
+  else home.show();
+  if(windowWidth < 629 || windowHeight < 437){
+    document.getElementById('disab').style.display = 'block';
+  }
+  else document.getElementById('disab').style.display = 'none';
+}
 function mousePressed(){
   if(mode == 0){
   if(mouseY > 100 && mouseY < windowHeight-15){//roll
