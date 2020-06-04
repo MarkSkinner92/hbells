@@ -14,3 +14,7 @@ Yankee Doodle,true,9,false
 Joy To The World,true,8,false
 Ring Around The Rosie,true,5,true
 Good King Wenceslas,true,8,false
+Hickory Dickory Dock,true,6,false
+Little Miss Muffet,false,7,false
+Log Drivers Waltz,true,12,false
+O Canada,true,11,false
