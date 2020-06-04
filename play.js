@@ -745,10 +745,3 @@ Object.defineProperty(Array.prototype, 'shuffle', {
         return this;
     }
 });
-
-function noScroll() {
-  window.scrollTo(0, 0);
-}
-
-// add listener to disable scroll
-window.addEventListener('scroll', noScroll);
