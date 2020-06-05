@@ -730,9 +730,6 @@ function search(keyterm){
   }
   else sorteddat = formatdat;
 }
-// window.onblur = function() {
-//     if(paused) _play();
-// };
 document.addEventListener('contextmenu', function(e) {
   e.preventDefault();
 });

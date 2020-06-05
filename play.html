@@ -17,10 +17,6 @@
   <!-- This line removes any default padding and style.
        You might only need one of these values set. -->
   <style> body { padding: 0; margin: 0; }
-  body.modal-open {
-    overflow: hidden;
-    position: fixed;
-  }
   .image-upload>input {
     display: none;
   }
@@ -30,11 +26,11 @@
   img:hover {
     filter: brightness(85%);
   }
-  html, body { overflow: hidden; over};
 </style>
 </head>
 
-<body style="overflow: hidden">
+<body>
+  <div style="overflow:hidden; margin:0; padding:0">
   <div class="image-upload">
   <label for="file-input">
     <img src="playRes/openfile.png" style="position: absolute;
@@ -42,6 +38,7 @@
     top: 41px;" alt="open a file from your computer"/>
   </label>
 </div>
+<a id = 'homeparent' href="index.html" style="position: fixed;z-index:100;"></a>
 <a target="_blank" id = 'getcodeparent' href="https://www.patreon.com/handybells?fan_landing=true"></a>
   <h3 id="songinfo" style="position: absolute; top: -10px;text-align: left; color: white; width:200; left:920px;">Please wait...</h3>
 <div id="disab" style="
@@ -62,6 +59,6 @@
   transform: translate(-50%, -50%);
     "> Screen size too small for intended purpose</h1>
   </div>
-  <a id = 'homeparent' href="index.html" style="position: fixed;z-index:100; display:block"></a>
+</div>
 </body>
 </html>
