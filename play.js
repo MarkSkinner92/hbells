@@ -4,15 +4,15 @@ let songinput, songbank, play,stop,
 let hitimg, barA, soundssort;
 let hitx = 0, mode = 0;
 let staves = [], barlinepos = [];
-var notesounds = [];
+let notesounds = [];
 let tickrate = 5;
 let notedata = [], noteindex = [25], notesused = [], notetostaff=[];
 let playback = false, playbackbar, playbackbeat = 0, playbacktime = 0, playbacktempotime, lasttime = 0;
 let paused = false, playsound = true;
 let songinthehouse = false;
-var timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
-var onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
-var nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
+let timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
+let onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
+let nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
 let songinfo;
 // let bkimg;
 //library elements
@@ -34,7 +34,8 @@ function preload(){//-160 x
   // bkimg = loadImage('bkgimg.png');
 }
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  g = createCanvas(windowWidth, windowHeight);
+  print(g);
   textStyle(BOLD);
   for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+onv[i]+'.wav');
   songinput = createFileInput(getFile);
@@ -135,7 +136,7 @@ function setup() {
   }
   formatdat.shuffle();
   let y = formatdat.findIndex(isfree);
-  var b = formatdat[y];
+  let b = formatdat[y];
   formatdat[y] = formatdat[0];
   formatdat[0] = b;
   hitx = windowWidth*0.83;
@@ -155,7 +156,6 @@ function draw() {
     if(playback){
       if(tempoinput.value() == '' || isNaN(tempoinput.value()) || tempoinput.value() < 50) playbacktempotime = 600;
       else playbacktempotime = 60000/tempoinput.value();
-      barinput.value(playbackbar+1);
       if(playbacktime >= 0){
         StartNotesAt(playbackbar,playbackbeat);
         playbackbeat+=0.5;
@@ -164,6 +164,7 @@ function draw() {
         if(playbackbeat>=(playbackbar==0?timesig.pickup:timesig.top)){
           playbackbeat = 0;
           playbackbar++;
+          barinput.value(playbackbar+1);
         }
       }
       playbacktime += (millis()-lasttime);
@@ -171,7 +172,7 @@ function draw() {
       playbackbar = barinput.value()-1;
     }
   }
-    lasttime = millis();
+  lasttime = millis();
 
   if(songinthehouse){
     strokeWeight(3);
@@ -188,16 +189,14 @@ function draw() {
   image(selector,642,37);
   image(selector,783,37);
   //draw staves
+  stroke('#c5c56c');
+  strokeWeight(3);
   if(paused){
-    stroke('#c5c56c');
-    strokeWeight(3);
-    for(let i = 0; i < barlinepos.length; i++){
-      barlinepos[i]+=tickrate;
-    }
     if(barlinepos[barlinepos.length-1] >= hitx){
       barlinepos.pop();
     }
     for(let i = 0; i < barlinepos.length; i++){
+      barlinepos[i]+=tickrate;
       line(barlinepos[i],82,barlinepos[i],windowHeight-13);
     }
     for(let i = 0; i < staves.length; i++){
@@ -206,8 +205,6 @@ function draw() {
     }
   }
   else{
-    strokeWeight(3);
-    stroke('#c5c56c');
     for(let i = 0; i < barlinepos.length; i++){
       line(barlinepos[i],82,barlinepos[i],windowHeight-13);
     }
@@ -380,8 +377,8 @@ class Staff {
     this.deleteme = false;
   }
   display() {
+    fill(this.c,66,35);
     strokeWeight(3);
-    fill('#134F94');
     noStroke();
     textAlign(LEFT, TOP);
     textSize(this.s/3);
@@ -390,12 +387,16 @@ class Staff {
     stroke('#2a2a37');
     line(0,this.y,windowWidth,this.y);
     image(hitimg,hitx-this.s/2,this.y-this.s/2,this.s,this.s);
-    fill('#134F94');
+
     noStroke();
     let length = this.notes.length;
-    fill(this.c,66,35);
     for(let i = 0; i < length; i++){
-      ellipse(this.notes[i], this.y, this.s-4, this.s-4);
+      if(this.notes[i] >= hitx-tickrate-tickrate){
+        ellipse(this.notes[i], this.y, this.s*2, this.s*2);
+      }
+      else{
+        ellipse(this.notes[i], this.y, this.s-4, this.s-4);
+      }
     }
   }
   tick(){
@@ -406,8 +407,11 @@ class Staff {
     }
     if(this.notes[length-1] >= hitx){
       if(playsound){
-        if(isNaN(transposeinput.value())) notesounds[n].play();
-        else notesounds[n-Number(transposeinput.value())].play();
+        try{
+          if(isNaN(transposeinput.value())) notesounds[n].play();
+          else notesounds[n-Number(transposeinput.value())].play();
+        }
+        catch(e){}
       }
       this.notes.pop();
     }
@@ -488,8 +492,8 @@ function updatetranspose(){
     let c = Number(transposeinput.value());
     let lowest = 25;
     let highest = -1;
-    var tmp;
-    for (var i=notesused.length-1; i>=0; i--) {
+    let tmp;
+    for (let i=notesused.length-1; i>=0; i--) {
         tmp = notesused[i].note;
         if (tmp < lowest) lowest = tmp;
         if (tmp > highest) highest = tmp;
@@ -654,7 +658,7 @@ function hideCode(){
 function okCode(){
   mode = 0;
   hideCode();
-  var d = new Date();
+  let d = new Date();
   if(code.value() == (d.getMonth()*361+(d.getFullYear()*0xF3)-450000).toString(16)){
     permited = true;
     showLibrary();
