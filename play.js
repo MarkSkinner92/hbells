@@ -1,28 +1,22 @@
-let songinput, songbank, play,stop,
- barM, barP, tempoM, tempoP, transM, transP,
- tempoinput, barinput, transposeinput, playsounds, viewmode,colormode, home;
-let hitimg, barA, soundssort;
 let hitx = 0, mode = 0;
 let staves = [], barlinepos = [];
 let notesounds = [];
 let tickrate = 5;
-let notedata = [], noteindex = [25], notesused = [], notetostaff=[];
+let notedata = [], noteindex = [25], notesused = [], notetostaff=[], bbl=[];//bbl bar beat list notation is a 2d array storing lists for evry beat of what notes are played at that beat
 let playback = false, playbackbar, playbackbeat = 0, playbacktime = 0, playbacktempotime, lasttime = 0;
 let paused = false, playsound = true;
 let songinthehouse = false;
 let timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
 let onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 let nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
-let songinfo;
-// let bkimg;
+// let songinfo;
 //library elements
-let showlib = true, libmain, libbanner, libsearch, libP, libM, libonoff, left, right, entercode, libcancel,currentsongdata,dat=[], formatdat = [];
-let sorteddat = [], shiftElements = 0, searchdiatonic = false;
+let showlib=true, dat=[], formatdat=[];
+let sorteddat=[], shiftElements = 0, searchdiatonic = false;
 //code elements
-let codepanel, getcode, ok, cancel, code;
 let permited = false, justwaitforoneclick = false;
 p5.disableFriendlyErrors = true;
-function preload(){//-160 x
+function preload(){
   hitimg = loadImage('playRes/guide.png');
   barA = loadImage('playRes/barA.png');
   soundssort = loadImage('playRes/soundssort.png');
@@ -34,8 +28,7 @@ function preload(){//-160 x
   // bkimg = loadImage('bkgimg.png');
 }
 function setup() {
-  g = createCanvas(windowWidth, windowHeight);
-  print(g);
+  createCanvas(windowWidth, windowHeight);
   textStyle(BOLD);
   for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+onv[i]+'.wav');
   songinput = createFileInput(getFile);
@@ -105,8 +98,10 @@ function setup() {
   home.parent('homeparent');
   libsearch = createInput();
   libsearch.input(searchEvent);
+  libsearch.size(290,29);
   libbells = createInput();
   libbells.input(searchBellEvent);
+  libbells.size(37,30);
   libM = createImg('playRes/minus.png');
   libP = createImg('playRes/plus.png');
   libonoff = createImg('playRes/lib/off.png');
@@ -119,6 +114,7 @@ function setup() {
   entercode.mousePressed(toggleCode);
   libcancel = createImg('playRes/cancel.png');
   libcancel.mousePressed(hideLibrary);
+  songinfo = document.getElementById('songinfo');
 
   //enter code menu (incomplete)
   getcode = createImg('playRes/getcode.png');
@@ -130,23 +126,23 @@ function setup() {
   code = createInput();
   code.attribute('type','password');
   hideCode();
+
+  //split the raw songs dat.txt file into song paths and store in formatdat
   for(let i = 0; i < dat.length-1; i++){
     let s = dat[i].split(',');
     formatdat[i] = {name:s[0],premium:(s[1]=='true'),bells:s[2],diatonic:s[3]};
   }
+
+  //randomize formatdat but keep atleast one freebee on the first page
   formatdat.shuffle();
-  let y = formatdat.findIndex(isfree);
+  let y = formatdat.findIndex(function isfree(fd){return !fd.premium;});
   let b = formatdat[y];
   formatdat[y] = formatdat[0];
   formatdat[0] = b;
-  hitx = windowWidth*0.83;
+
   currentsongdata = loadStrings('playRes/lib/songs/London_Bridge.txt', callbackloadfile);
   sorteddat = formatdat;
-  songinfo = document.getElementById('songinfo');
   styleSettings();
-}
-function isfree(ob){
-  return !ob.premium;
 }
 function draw() {
   background('#f9faeb');
@@ -174,12 +170,14 @@ function draw() {
   }
   lasttime = millis();
 
+  //draw hitline if song is loaded
   if(songinthehouse){
     strokeWeight(3);
     stroke('#2a2a37');
     line(hitx,0,hitx,windowHeight);
   }
 
+  //draw top and bottom bars and background images
   noStroke();
   fill('#185162');
   rect(0,0,windowWidth,81);
@@ -188,16 +186,18 @@ function draw() {
   image(soundssort,576,18);
   image(selector,642,37);
   image(selector,783,37);
-  //draw staves
+
+  //draw staves and bar lines, and move them
   stroke('#c5c56c');
   strokeWeight(3);
   if(paused){
-    if(barlinepos[barlinepos.length-1] >= hitx){
-      barlinepos.pop();
-    }
-    for(let i = 0; i < barlinepos.length; i++){
+    let bl = barlinepos.length;
+    for(let i = 0; i < bl; i++){
       barlinepos[i]+=tickrate;
       line(barlinepos[i],82,barlinepos[i],windowHeight-13);
+    }
+    if(barlinepos[bl-1] >= hitx){
+      barlinepos.pop();
     }
     for(let i = 0; i < staves.length; i++){
       staves[i].tick();
@@ -212,6 +212,8 @@ function draw() {
       staves[i].display();
     }
   }
+
+  //draw library menu background
   if(showlib){
     noStroke();
     fill('#185162');
@@ -220,9 +222,7 @@ function draw() {
     rect(windowWidth/2-317,200,634,254,4);
     image(libmain,windowWidth/2-317, 139);
     libsearch.position(windowWidth/2-314,159);
-    libsearch.size(290,29);
     libbells.position(windowWidth/2+24,158);
-    libbells.size(37,30);
     libP.position(windowWidth/2+62,166);
     libM.position(windowWidth/2+8,165);
     libonoff.position(windowWidth/2+173,158);
@@ -230,7 +230,6 @@ function draw() {
     right.position(windowWidth/2+7, 459);
     entercode.position(windowWidth/2+88,459);
     libcancel.position(windowWidth/2+247,459);
-
     fill('#7edf27');
     switch(max(0,sorteddat.length-shiftElements)){
       default:
@@ -291,7 +290,6 @@ function drawSongTile(x,y,obj){
 }
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  hitx = windowWidth*0.83;
   for(let i = 0; i < staves.length; i++){
     let y = getStafY(i);
     staves[i].y = y;
@@ -300,6 +298,7 @@ function windowResized() {
   styleSettings();
 }
 function styleSettings(){
+  hitx = windowWidth*0.83;
   if(hitx < 907){
     songinfo.style.display = 'none';
   }
@@ -314,9 +313,10 @@ function getFile(file){
   showlib=false;
   hideLibrary();
 }
+//data is an array of strings, the first 8 are metadata
+//the next are pairs of 3, {note pitch form 0-24 (high to low), bar, beat}
 function loadSong(data){
-  notesused = [];
-  notetostaff = [];
+  notesused = [], notetostaff = [];
   timesig.pickup = Number(data[0]);
   timesig.top = Number(data[1]);
   timesig.tempo = Number(data[2]);
@@ -325,10 +325,14 @@ function loadSong(data){
   transposeinput.value(0);
   timesig.name = data[3];
   notedata = [(data.length-9)/3];
+  bbl = [];
   let index = 8;
   for(let i = 0; i < 25; i++) noteindex[i] = 0;
   for(let i = 0; i < (data.length-9)/3; i++){
     notedata[i] = {p:Number(data[index]),bar:Number(data[index+1]),beat:Number(data[index+2])};
+    if(bbl[notedata[i].bar] == undefined) bbl[notedata[i].bar] = [];
+    if(bbl[notedata[i].bar][notedata[i].beat] == undefined) bbl[notedata[i].bar][notedata[i].beat] = [];
+    bbl[notedata[i].bar][notedata[i].beat].push(notedata[i].p);
     noteindex[notedata[i].p]++;
     index+=3;
   }
@@ -358,11 +362,12 @@ function getStafY(i){
   return ((windowHeight-100)/notesused.length)*(i+0.5)+85;
 }
 function StartNotesAt(bar, beat){
-  for(let i = 0; i < notedata.length; i++){
-    c = notedata[i];
-    if(c.bar == bar && c.beat == beat){
-      //add note to appropriate staff
-      staves[notetostaff[c.p]].notes.unshift(-100);
+  print(bar,beat)
+  if(bar >= bbl.length) return;
+  if(bbl[bar] != undefined){
+    if(bbl[bar][beat] != undefined){
+      let c = bbl[bar][beat];
+      for(let i = 0; i < c.length; i++) staves[notetostaff[c[i]]].notes.unshift(-100);
     }
   }
 }
@@ -407,11 +412,8 @@ class Staff {
     }
     if(this.notes[length-1] >= hitx){
       if(playsound){
-        try{
-          if(isNaN(transposeinput.value())) notesounds[n].play();
-          else notesounds[n-Number(transposeinput.value())].play();
-        }
-        catch(e){}
+        if(isNaN(transposeinput.value())) notesounds[n].play();
+        else notesounds[n-Number(transposeinput.value())].play();
       }
       this.notes.pop();
     }
