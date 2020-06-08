@@ -362,7 +362,7 @@ function getStafY(i){
   return ((windowHeight-100)/notesused.length)*(i+0.5)+85;
 }
 function StartNotesAt(bar, beat){
-  print(bar,beat)
+  // print(bar,beat)
   if(bar >= bbl.length) return;
   if(bbl[bar] != undefined){
     if(bbl[bar][beat] != undefined){
