@@ -18,3 +18,8 @@ Hickory Dickory Dock,true,6,false
 Little Miss Muffet,false,7,false
 Log Drivers Waltz,true,12,false
 O Canada,true,11,false
+Angels We Have Heard On High,true,6,false
+Away In A Manger,true,9,false
+Deck The Halls,true,9,false
+Frosty The Snowman,false,9,false
+God Rest Ye Merry Gentlemen,true,11,false
