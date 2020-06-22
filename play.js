@@ -5,7 +5,7 @@ let tickrate = 5;
 let notedata = [], noteindex = [25], notesused = [], notetostaff=[], bbl=[];//bbl bar beat list notation is a 2d array storing lists for evry beat of what notes are played at that beat
 let playback = false, playbackbar, playbackbeat = 0, playbacktime = 0, playbacktempotime, lasttime = 0;
 let paused = false, playsound = true;
-let songinthehouse = false;
+let songinthehouse = false, horzon = true; //if false, the staves will be verticaly alligned
 let timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
 let onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 let nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
@@ -174,18 +174,9 @@ function draw() {
   if(songinthehouse){
     strokeWeight(3);
     stroke('#2a2a37');
-    line(hitx,0,hitx,windowHeight);
+    if(horzon) line(hitx,0,hitx,windowHeight);
+    else line(0,hitx, windowWidth, hitx);
   }
-
-  //draw top and bottom bars and background images
-  noStroke();
-  fill('#185162');
-  rect(0,0,windowWidth,81);
-  rect(0,windowHeight-13,windowWidth,13);
-  image(barA,271,16);
-  image(soundssort,576,18);
-  image(selector,642,37);
-  image(selector,783,37);
 
   //draw staves and bar lines, and move them
   stroke('#c5c56c');
@@ -194,7 +185,7 @@ function draw() {
     let bl = barlinepos.length;
     for(let i = 0; i < bl; i++){
       barlinepos[i]+=tickrate;
-      line(barlinepos[i],82,barlinepos[i],windowHeight-13);
+      dbl(i);
     }
     if(barlinepos[bl-1] >= hitx){
       barlinepos.pop();
@@ -206,12 +197,25 @@ function draw() {
   }
   else{
     for(let i = 0; i < barlinepos.length; i++){
-      line(barlinepos[i],82,barlinepos[i],windowHeight-13);
+      dbl(i);
     }
     for(let i = 0; i < staves.length; i++){
       staves[i].display();
     }
   }
+  function dbl(i){
+    if(horzon) line(barlinepos[i],82,barlinepos[i],windowHeight-13);
+    else line(0,barlinepos[i],windowWidth,barlinepos[i]);
+  }
+  //draw top and bottom bars and background images
+  noStroke();
+  fill('#185162');
+  rect(0,0,windowWidth,81);
+  rect(0,windowHeight-13,windowWidth,13);
+  image(barA,271,16);
+  image(soundssort,576,18);
+  image(selector,642,37);
+  image(selector,783,37);
 
   //draw library menu background
   if(showlib){
@@ -290,15 +294,16 @@ function drawSongTile(x,y,obj){
 }
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  for(let i = 0; i < staves.length; i++){
-    let y = getStafY(i);
-    staves[i].y = y;
-    staves[i].s = ((windowHeight-89)/(notesused.length))*0.9;
-  }
   styleSettings();
 }
 function styleSettings(){
-  hitx = windowWidth*0.83;
+  if(horzon)hitx = windowWidth*0.83;
+  else hitx = windowHeight*0.83;
+  for(let i = 0; i < staves.length; i++){
+    let y = getStafY(i);
+    staves[i].y = y;
+    staves[i].s = horzon?((windowHeight-89)/(notesused.length))*0.9: ((windowWidth-100)/notesused.length)*0.7;
+  }
   if(hitx < 907){
     songinfo.style.display = 'none';
   }
@@ -344,6 +349,7 @@ function loadSong(data){
       notetostaff[i]=notesused.length-1;//lookup table from note # to staves[] index
     }
   }
+  horzon = (notesused.length>8)?false:true;
   staves = [];
   let len = notesused.length;
   for(let i = 0; i < len; i++){
@@ -359,7 +365,8 @@ function loadSong(data){
   resort();
 }
 function getStafY(i){
-  return ((windowHeight-100)/notesused.length)*(i+0.5)+85;
+  if(horzon) return ((windowHeight-100)/notesused.length)*(i+0.5)+85;
+  else return ((windowWidth-100)/notesused.length)*(i+0.5)+50;
 }
 function StartNotesAt(bar, beat){
   // print(bar,beat)
@@ -382,25 +389,51 @@ class Staff {
     this.deleteme = false;
   }
   display() {
-    fill(this.c,66,35);
-    strokeWeight(3);
-    noStroke();
-    textAlign(LEFT, TOP);
-    textSize(this.s/3);
-    if(isNaN(transposeinput.value())) text(nv[this.p],hitx+this.s/2+5,this.y+5);
-    else text(nv[this.p-Number(transposeinput.value())],hitx+this.s/2+5,this.y+5);
-    stroke('#2a2a37');
-    line(0,this.y,windowWidth,this.y);
-    image(hitimg,hitx-this.s/2,this.y-this.s/2,this.s,this.s);
+    if(horzon){
+      fill(this.c,66,35);
+      strokeWeight(3);
+      noStroke();
+      textAlign(LEFT, TOP);
+      textSize(this.s/3);
+      if(isNaN(transposeinput.value())) text(nv[this.p],hitx+this.s/2+5,this.y+5);
+      else text(nv[this.p-Number(transposeinput.value())],hitx+this.s/2+5,this.y+5);
+      stroke('#2a2a37');
+      line(0,this.y,windowWidth,this.y);
+      image(hitimg,hitx-this.s/2,this.y-this.s/2,this.s,this.s);
 
-    noStroke();
-    let length = this.notes.length;
-    for(let i = 0; i < length; i++){
-      if(this.notes[i] >= hitx-tickrate-tickrate){
-        ellipse(this.notes[i], this.y, this.s*2, this.s*2);
+      noStroke();
+      let length = this.notes.length;
+      for(let i = 0; i < length; i++){
+        if(this.notes[i] >= hitx-tickrate-tickrate){
+          ellipse(this.notes[i], this.y, this.s*2, this.s*2);
+        }
+        else{
+          ellipse(this.notes[i], this.y, this.s-4, this.s-4);
+        }
       }
-      else{
-        ellipse(this.notes[i], this.y, this.s-4, this.s-4);
+    }
+    else{
+      fill(this.c,66,35);
+      strokeWeight(3);
+      noStroke();
+      textAlign(LEFT, TOP);
+      textSize(this.s/3);
+      let num = nv[this.p];
+      if(!isNaN(transposeinput.value())) num = nv[this.p-Number(transposeinput.value())];
+      text(num,this.y-this.s/2,hitx+this.s/2+5);
+      stroke('#2a2a37');
+      line(this.y,0,this.y,windowHeight);
+      image(hitimg,this.y-this.s/2,hitx-this.s/2,this.s,this.s);
+
+      noStroke();
+      let length = this.notes.length;
+      for(let i = 0; i < length; i++){
+        if(this.notes[i] >= hitx-tickrate-tickrate){
+          ellipse(this.y,this.notes[i], this.s*2, this.s*2);
+        }
+        else{
+          ellipse(this.y,this.notes[i], this.s-4, this.s-4);
+        }
       }
     }
   }
@@ -565,6 +598,7 @@ function resort(){
       }
     break;
   }
+  styleSettings();
 }
 function openSongBank(){
   if(mode == 0) showLibrary();
