@@ -366,7 +366,7 @@ function loadSong(data){
 }
 function getStafY(i){
   if(horzon) return ((windowHeight-100)/notesused.length)*(i+0.5)+85;
-  else return ((windowWidth-100)/notesused.length)*(i+0.5)+50;
+  else return windowWidth - (((windowWidth-100)/notesused.length)*(i+0.5)+50);
 }
 function StartNotesAt(bar, beat){
   // print(bar,beat)
