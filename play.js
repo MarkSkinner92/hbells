@@ -3,7 +3,7 @@ let staves = [], barlinepos = [];
 let notesounds = [];
 let tickrate = 5;
 let notedata = [], noteindex = [25], notesused = [], notetostaff=[], bbl=[];//bbl bar beat list notation is a 2d array storing lists for evry beat of what notes are played at that beat
-let playback = false, playbackbar, playbackbeat = 0, playbacktime = 0, playbacktempotime, lasttime = 0;
+let playback = false, playbackbar, playbackbeat = 0, playbacktime = 0, playbacktempotime, lasttime = 0, playbackcount = 0, playbackmax = 0;
 let paused = false, playsound = true;
 let songinthehouse = false, horzon = true; //if false, the staves will be verticaly alligned
 let timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
@@ -163,6 +163,7 @@ function draw() {
           barinput.value(playbackbar+1);
         }
       }
+      if(playbackcount >= playbackmax) _stop();
       playbacktime += (millis()-lasttime);
     }else{
       playbackbar = barinput.value()-1;
@@ -330,6 +331,7 @@ function loadSong(data){
   transposeinput.value(0);
   timesig.name = data[3];
   notedata = [(data.length-9)/3];
+  playbackmax = (data.length-9)/3;
   bbl = [];
   let index = 8;
   for(let i = 0; i < 25; i++) noteindex[i] = 0;
@@ -448,6 +450,7 @@ class Staff {
         if(isNaN(transposeinput.value())) notesounds[n].play();
         else notesounds[n-Number(transposeinput.value())].play();
       }
+      playbackcount++;
       this.notes.pop();
     }
   }
@@ -507,6 +510,7 @@ function _stop(){
   }
   playback = false;
   playbackbar = 0;
+  playbackcount = 0;
   playbackbeat = 0;
   barinput.value(1);
   paused = false;
