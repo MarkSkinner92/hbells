@@ -303,6 +303,11 @@ function mousePressed(){
   }
   if(cancelmenu){cancelmenu = false; mode = 0}
 }
+function keyPressed(){
+  if(key == ' '){
+    _play();
+  }
+}
 function mouseInRect(a,b,c,d){
   if(mouseX < a+c && mouseX > a && mouseY > b && mouseY < b+d) return true;
   return false;
