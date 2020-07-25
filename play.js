@@ -9,26 +9,17 @@ let songinthehouse = false, horzon = true; //if false, the staves will be vertic
 let timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
 let onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 let nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
-// let songinfo;
-//library elements
-let showlib=true, dat=[], formatdat=[];
-let sorteddat=[], shiftElements = 0, searchdiatonic = false;
-//code elements
-let permited = false, justwaitforoneclick = false;
 p5.disableFriendlyErrors = true;
+let focused = false;
 function preload(){
   hitimg = loadImage('playRes/guide.png');
   barA = loadImage('playRes/barA.png');
   soundssort = loadImage('playRes/soundssort.png');
   selector = loadImage('playRes/selector.png');
-  libmain = loadImage('playRes/lib/main.png');
-  dat = loadStrings('playRes/lib/dat.txt');
-  libbanner = loadImage('playRes/banner.png');
-  codepanel = loadImage('playRes/codewindow.png');
-  // bkimg = loadImage('bkgimg.png');
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  attatchDemoClickListeners();
   textStyle(BOLD);
   for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+onv[i]+'.wav');
   songinput = createFileInput(getFile);
@@ -38,7 +29,7 @@ function setup() {
   songinput.hide();
   songbank = createImg('playRes/library.png');
   songbank.position(79,10);
-  songbank.mousePressed(openSongBank);
+  songbank.mousePressed(showLib);
   play = createImg('playRes/play.png');
   play.position(178,20);
   play.mousePressed(_play);
@@ -96,53 +87,15 @@ function setup() {
   home = createImg('playRes/home.png');
   home.position(12,14);
   home.parent('homeparent');
-  libsearch = createInput();
-  libsearch.input(searchEvent);
-  libsearch.size(290,29);
-  libbells = createInput();
-  libbells.input(searchBellEvent);
-  libbells.size(37,30);
-  libM = createImg('playRes/minus.png');
-  libP = createImg('playRes/plus.png');
-  libonoff = createImg('playRes/lib/off.png');
-  libonoff.mousePressed(toggleDiatonic);
-  left = createImg('playRes/lib/left.png');
-  left.mousePressed(_left);
-  right = createImg('playRes/lib/right.png');
-  right.mousePressed(_right);
-  entercode = createImg('playRes/lib/entercode.png');
-  entercode.mousePressed(toggleCode);
-  libcancel = createImg('playRes/cancel.png');
-  libcancel.mousePressed(hideLibrary);
-  songinfo = document.getElementById('songinfo');
 
-  //enter code menu (incomplete)
-  getcode = createImg('playRes/getcode.png');
-  getcode.parent('getcodeparent');
-  ok = createImg('playRes/ok.png');
-  ok.mousePressed(okCode);
-  cancel = createImg('playRes/cancel.png');
-  cancel.mousePressed(cancelCode);
-  code = createInput();
-  code.attribute('type','password');
-  hideCode();
-
-  //split the raw songs dat.txt file into song paths and store in formatdat
-  for(let i = 0; i < dat.length-1; i++){
-    let s = dat[i].split(',');
-    formatdat[i] = {name:s[0],premium:(s[1]=='true'),bells:s[2],diatonic:s[3]};
-  }
-
-  //randomize formatdat but keep atleast one freebee on the first page
-  formatdat.shuffle();
-  let y = formatdat.findIndex(function isfree(fd){return !fd.premium;});
-  let b = formatdat[y];
-  formatdat[y] = formatdat[0];
-  formatdat[0] = b;
-
-  currentsongdata = loadStrings('playRes/lib/songs/London_Bridge.txt', callbackloadfile);
-  sorteddat = formatdat;
+  currentsongdata = loadStrings('playRes/lib/songs/London Bridge (6 bells).txt', callbackloadfile);
   styleSettings();
+}
+function attatchDemoClickListeners(){
+  let demos = document.getElementsByClassName('demo');
+  for(let i = 0; i < demos.length; i++){
+    demos[i].addEventListener("click", clickedOnSong);
+  }
 }
 function draw() {
   background('#f9faeb');
@@ -217,81 +170,9 @@ function draw() {
   image(soundssort,576,18);
   image(selector,642,37);
   image(selector,783,37);
-
-  //draw library menu background
-  if(showlib){
-    noStroke();
-    fill('#185162');
-    rect(windowWidth/2-336,130,672,361,9);
-    fill('#1e6980');
-    rect(windowWidth/2-317,200,634,254,4);
-    image(libmain,windowWidth/2-317, 139);
-    libsearch.position(windowWidth/2-314,159);
-    libbells.position(windowWidth/2+24,158);
-    libP.position(windowWidth/2+62,166);
-    libM.position(windowWidth/2+8,165);
-    libonoff.position(windowWidth/2+173,158);
-    left.position(windowWidth/2-33, 459);
-    right.position(windowWidth/2+7, 459);
-    entercode.position(windowWidth/2+88,459);
-    libcancel.position(windowWidth/2+247,459);
-    fill('#7edf27');
-    switch(max(0,sorteddat.length-shiftElements)){
-      default:
-        drawSongTile(windowWidth/2+7,332,sorteddat[3+shiftElements]);
-      case 3:
-        drawSongTile(windowWidth/2+7,211,sorteddat[2+shiftElements]);
-      case 2:
-        drawSongTile(windowWidth/2-303,332,sorteddat[1+shiftElements]);
-      case 1:
-        drawSongTile(windowWidth/2-303,211,sorteddat[0+shiftElements]);
-      case 0:
-      break;
-    }
-  }
-  if(mode == 2)showCodeMenu();
-}
-function mousePressed(){
-  if(justwaitforoneclick) justwaitforoneclick = false;
-  else if(showlib) switch(sorteddat.length-shiftElements){
-    default:
-      mouseOverTile(windowWidth/2+7,332,sorteddat[3+shiftElements]);
-    case 3:
-      mouseOverTile(windowWidth/2+7,211,sorteddat[2+shiftElements]);
-    case 2:
-      mouseOverTile(windowWidth/2-303,332,sorteddat[1+shiftElements]);
-    case 1:
-      mouseOverTile(windowWidth/2-303,211,sorteddat[0+shiftElements]);
-    case 0:
-    break;
-  }
 }
 function callbackloadfile(){
   loadSong(currentsongdata);
-}
-function mouseOverTile(x,y,obj){
-  if(mouseX > x && mouseX < x+296 && mouseY > y && mouseY < y+107 && !(obj.premium && !permited)){
-    currentsongdata = loadStrings('playRes/lib/songs/'+(obj.name.replace(/ /g, '_'))+'.txt', callbackloadfile);
-    hideLibrary();
-  }
-}
-function drawSongTile(x,y,obj){
-  if(mouseX > x && mouseX < x+296 && mouseY > y && mouseY < y+107){
-    if(obj.premium && !permited){fill('#911db4');
-    }else fill('#559b17');
-  }
-  else{
-    if(obj.premium && !permited){fill('#b327df');
-    }else fill('#61b11b');
-  }
-  rect(x,y,296,107,4);
-  if(obj.premium && !permited) image(libbanner,x+251,y);
-  fill(255);
-  textSize(16);
-  textAlign(CENTER,CENTER);
-  text(obj.name,x+148,y+45);
-  textSize(12);
-  text(obj.bells+' Bells '+(obj.diatonic=='true'?'Diatonic':'Chromatic'),x+148,y+70);
 }
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -303,21 +184,15 @@ function styleSettings(){
   for(let i = 0; i < staves.length; i++){
     let y = getStafY(i);
     staves[i].y = y;
-    staves[i].s = horzon?((windowHeight-89)/(notesused.length))*0.9: ((windowWidth-100)/notesused.length)*0.7;
+    staves[i].s = constrain(horzon?((windowHeight-89)/(notesused.length))*0.9: ((windowWidth-100)/notesused.length)*0.7,30,200);
   }
   if(hitx < 907){
     songinfo.style.display = 'none';
   }
   else songinfo.style.display = 'block';
-  if(windowWidth < 629 || windowHeight < 492){
-    document.getElementById('disab').style.display = 'block';
-  }
-  else document.getElementById('disab').style.display = 'none';
 }
 function getFile(file){
   loadSong(file.data.split('\n'));
-  showlib=false;
-  hideLibrary();
 }
 //data is an array of strings, the first 8 are metadata
 //the next are pairs of 3, {note pitch form 0-24 (high to low), bar, beat}
@@ -363,7 +238,6 @@ function loadSong(data){
   playbackbeat = 0;
   paused = false;
   songinthehouse = true;
-  document.getElementById("songinfo").innerHTML = timesig.name + ', '+notesused.length + ' bells';
   resort();
 }
 function getStafY(i){
@@ -604,9 +478,6 @@ function resort(){
   }
   styleSettings();
 }
-function openSongBank(){
-  if(mode == 0) showLibrary();
-}
 function _barP(){
   barinput.value(Number(barinput.value())+1);
 }
@@ -628,103 +499,18 @@ function _transM(){
   transposeinput.value(Number(transposeinput.value())-1);
   updatetranspose();
 }
-function showLibrary(){
-  mode = 1;
-  showlib = true;
-  libsearch.show();
-  libP.show();
-  libM.show();
-  libonoff.show();
-  libbells.show();
-  left.show();
-  right.show();
-  entercode.show();
-  libcancel.show();
-  libsearch.elt.focus();
-}
-function hideLibrary(){
-  mode = 0;
-  showlib = false;
-  libsearch.hide();
-  libP.hide();
-  libM.hide();
-  libonoff.hide();
-  libbells.hide();
-  left.hide();
-  right.hide();
-  entercode.hide();
-  libcancel.hide();
-}
-function _left(){
-  if(shiftElements > 3) shiftElements-=4;
-}
-function _right(){
-  if(sorteddat.length-shiftElements > 4) shiftElements+=4;
-}
-function toggleDiatonic(){
-  searchdiatonic = !searchdiatonic;
-  updateDlever();
-  libsearch.value('');
-  libbells.value('');
-  diatonicsearch();
-}
-function updateDlever(){
-  if(searchdiatonic) libonoff.attribute('src','playRes/lib/on.png');
-  else libonoff.attribute('src','playRes/lib/off.png');
-}
-function toggleCode(){
-  hideLibrary();
-  mode = 2;
-}
-function showCodeMenu(){
-  image(codepanel, windowWidth/2-155, 130);
-  getcode.position(windowWidth/2-45,215);
-  getcode.show();
-  cancel.position(windowWidth/2+58,215);
-  cancel.show();
-  ok.position(windowWidth/2-127,215);
-  ok.show();
-  code.show();
-  code.position(windowWidth/2-68,177);
-  code.size(131,28);
-  code.elt.focus()
-}
-function hideCode(){
-  getcode.hide();
-  ok.hide();
-  cancel.hide();
-  code.hide();
-}
-function okCode(){
-  mode = 0;
-  hideCode();
-  let d = new Date();
-  if(code.value() == (d.getMonth()*361+(d.getFullYear()*0xF3)-450000).toString(16)){
-    permited = true;
-    showLibrary();
-    showlib = true;
-    mode = 1;
-    justwaitforoneclick = true;
-  }
-}
-function cancelCode(){
-  mode = 0;
-  hideCode();
-}
 function keyPressed(){
-  if(key == ' ' && !showlib){
+  if(key == ' ' && focused){
     _play();
   }
   if(keyCode == ENTER){
-    switch(mode){
-      case 0:
-        showlib = true;
-        showLibrary();
-      break;
-      case 2:
-        okCode();
-        justwaitforoneclick=false;
-      break;
+    let log = document.getElementById('loginenter');
+    let sig = document.getElementById('signinenter');
+    if(document.getElementById('Logindiv').style.display != 'none'){
+      log.click();
+    }
+    if(document.getElementById('Signindiv').style.display != 'none'){
+      sig.click();
     }
   }
 }
@@ -733,46 +519,6 @@ function searchEvent(){
   updateDlever();
   libbells.value('');
   search(libsearch.value());
-}
-function searchBellEvent(){
-  searchdiatonic = false;
-  updateDlever();
-  libsearch.value('');
-  searchBellLimit();
-}
-function diatonicsearch(){
-  shiftElements = 0;
-  if(searchdiatonic){
-  let list = [];
-  for(let i = 0; i < formatdat.length; i++){
-    if(formatdat[i].diatonic == 'true') list.push(formatdat[i]);
-  }
-  sorteddat = list;
-  }
-  else sorteddat = [...formatdat];
-}
-function searchBellLimit(){
-  shiftElements = 0;
-  shiftElements = 0;
-  if(Number(libbells.value()) > 0){
-  let list = [];
-  for(let i = 0; i < formatdat.length; i++){
-    if(Number(formatdat[i].bells) <= Number(libbells.value())) list.push(formatdat[i]);
-  }
-  sorteddat = list;
-  }
-  else sorteddat = [...formatdat];
-}
-function search(keyterm){
-  shiftElements = 0;
-  const options = {includeScore: false,keys: ['name']};
-  const fuse = new Fuse(formatdat, options);
-  const result = fuse.search(libsearch.value());
-  sorteddat = [];
-  if(result.length > 0) for(let i = 0; i < result.length; i++){
-    sorteddat.push(result[i].item);
-  }
-  else sorteddat = formatdat;
 }
 document.addEventListener('contextmenu', function(e) {
   e.preventDefault();
@@ -786,3 +532,153 @@ Object.defineProperty(Array.prototype, 'shuffle', {
         return this;
     }
 });
+function hideLogin() {
+  document.getElementById("Logindiv").style.display = "none";
+  focused = true;
+}
+function showLogin() {
+  hideLib();
+  focused = false;
+  let imgsrc = document.getElementById('Login').src;
+  if(imgsrc.substr(imgsrc.length-5) == 'n.png'){
+    document.getElementById("Logindiv").style.display = "inline";
+  }else{
+    console.log('signing out...');
+    firebase.auth().signOut().then(function() {
+      // Sign-out successful.
+      document.getElementById('Login').src = 'res/login.png';
+    }).catch(function(error) {
+      // An error happened.
+      console.log('could not sign out: '+error);
+    });
+  }
+}
+function hideSignin() {
+  document.getElementById("Signindiv").style.display = "none";
+  focused = true;
+}
+function showSignin() {
+  document.getElementById("Signindiv").style.display = "inline";
+  hideLib();
+  focused = false;
+}
+function showCorrectLib(){
+  let c = document.getElementsByClassName('cloud');
+  for(let i = 0; i < c.length; i++) c[i].style.display = 'block';
+}
+function showLib(){
+  _stop();
+  hideSignin();
+  hideLogin();
+  let usr = firebase.auth().currentUser;
+  let demos = document.getElementsByClassName('demo');
+
+  if(usr){
+    document.getElementById('libmode').style.display = 'inline';
+    document.getElementById('message').style.display = 'none';
+  }else{
+    document.getElementById('libmode').style.display = 'none';
+    document.getElementById('message').style.display = 'inline';
+  }
+  document.getElementById("library").style.display = "inline";
+  focused = false;
+}
+function hideLib(){
+  document.getElementById("library").style.display = "none";
+  focused = true;
+}
+function noUserSignedIn(){
+  let c = document.getElementById('entries').childNodes;
+  for(let i = 0; i < c.length; i++){
+    if(!hasClass(c[i],'demo')){
+      c[i].remove();
+      i--;
+    }
+  }
+  document.getElementById('acctmenubtn').style.display='none';
+  document.getElementById('welcome').innerHTML='Not signed in';
+  document.getElementById('Login').src = 'res/login.png';
+}
+function clickedOnSong(e){
+  console.log('clicked on ' + e.target);
+  if(e.target.nodeName == 'H1'){
+    openSongFromDiv(e.target.parentElement);
+  }
+  else openSongFromDiv(e.target);
+}
+function openSongFromDiv(targetdom){
+  // document.getElementById('liboptions').style.display = 'inline';
+  // document.getElementById('songtitleinlib').innerHTML = targetdom.firstChild.innerHTML;
+  document.getElementById("songinfo").innerHTML = targetdom.innerText;
+  usr = firebase.auth().currentUser;
+  timesig.name = targetdom.firstChild.innerHTML;
+  console.log(targetdom.firstChild.innerHTML);
+  //load song from database
+  if(hasClass(targetdom,'demo')){
+    currentsongdata = loadStrings('playRes/lib/songs/'+timesig.name+'.txt', callbackloadfile);
+    hideLib();
+  }
+  else{
+    var docRef = db.collection("Songs").doc(timesig.name.split(',')[0]+':'+usr.displayName+':'+usr.uid);
+    docRef.get().then(function(doc) {
+      songDocData=doc.data();
+      console.log('loading song');
+      loadSong(songDocData.data.split(','));
+      hideLib();
+    }).catch(function(e){
+      console.log('no song doc exists with that name   ' + timesig.name+':'+usr.displayName+':'+usr.uid);
+    });
+  }
+}
+function changeLibrary(){
+  if(document.getElementById('libmode').innerHTML == 'Show Private Library'){
+    //hide all public songs
+    let c = document.getElementsByClassName('cloud');
+    for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
+    //show all private songs
+    c = document.getElementsByClassName('personal');
+    for(let i = 0; i < c.length; i++) c[i].style.display = 'block';
+    document.getElementById('libmode').innerHTML = 'Show Public Library';
+  }else{
+    document.getElementById('libmode').innerHTML = 'Show Private Library';
+    let c = document.getElementsByClassName('cloud');
+    for(let i = 0; i < c.length; i++) c[i].style.display = 'block';
+    c = document.getElementsByClassName('personal');
+    for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
+  }
+}
+function genPublicThumbs(){
+  var docRef = db.collection("Songlists").doc('list1');
+  console.log('getting songlist 1... ' + docRef);
+  docRef.get().then(function(doc) {
+    currentUserDocData=doc.data();
+    //loop through all songs and create thumbs
+    let names = currentUserDocData.data.split(',');
+    for(let i = 0; i < names.length-1; i++){
+      console.log('creating elements');
+      let g = names[i].split(':');
+      var name = document.createElement("H1");
+      name.innerHTML = g[0] + ', by ' + g[1] + '  (' + g[3] + ' bells)'; //names[i].split(':')[1] for public or private
+      name.className = "innertext";
+      var info = document.createElement("H1");
+      info.innertext = "";
+      info.className = "innertext";
+      var entry = document.createElement("DIV");
+      entry.appendChild(name);
+      entry.appendChild(info);
+      entry.className = 'entry public cloud';
+      entry.id='songthumb';
+      entry.addEventListener("click", clickedOnSong);
+      try{openSongEditMenu(entry);}catch(err){}
+      document.getElementById("entries").appendChild(entry);
+    }
+    //hide all public songs initialy
+    // let usr = firebase.auth().currentUser;
+    // if(usr){
+      let c = document.getElementsByClassName('cloud');
+      for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
+    // }
+  }).catch(function(error) {
+      console.log("couldn't get songlist: " + error);
+  });
+}

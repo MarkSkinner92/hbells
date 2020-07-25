@@ -12,20 +12,178 @@
   <script language="javascript" type="text/javascript" src="play.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.0.0"></script>
 
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-analytics.js"></script>
+    <script src="firestuff.js"></script>
 
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
-  <style> body { padding: 0; margin: 0; overflow: hidden}
-  .image-upload>input {
-    display: none;
-  }
-  img{
+    <link href="https://fonts.googleapis.com/css2?family=Manjari&display=swap" rel="stylesheet">
+    <style> body { padding: 0; margin: 0; overflow: hidden}
+      .image-upload>input {
+        display: none;
+      }
+      img{
+          cursor: pointer;
+      }
+      img:hover , button:hover {
+        filter: brightness(85%);
+      }
+      .fullinput {
+      text-align: center;
+      width: 90%;
+      padding: 12px 20px;
+      margin: 5px auto 2vh auto;
+      display: block;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-family: 'Manjari', sans-serif;
+    }
+    .center{
+      text-align: center;
+      font-family: 'Manjari', sans-serif;
+      font-size: 25px;
+    }
+    .formbutton {
+      background-color: #7edf27;
+      color: black;
+      padding: 14px 20px;
+      margin: 8px 8px;
+      border: none;
       cursor: pointer;
-  }
-  img:hover {
-    filter: brightness(85%);
-  }
+      border-radius: 8px;
+      font-family: 'Manjari', sans-serif;
+      font-size: 20px
+    }
+    .smallertext{
+      font-size: 17px;
+    }
+</style>
+    <style>
+        .library{
+            display: none;
+            position: absolute;
+            padding: 0;
+            margin: 0px;
+            vertical-align:middle;
+            border-radius: 8px;
+            background-color: #185162;
+            width: 80%;
+            left: 10%;
+            height: calc(100% - 150px);
+            top: 100px;
+            overflow:hidden;
+            font-family: Arial;
+        }
+        .entries{
+            display: inline;
+            position: absolute;
+            padding: 0;
+            margin: 0px;
+            vertical-align:middle;
+            border-radius: 8px;
+            background-color: #2d98b9;
+            width: calc(100% - 16px);
+            left: 8px;
+            height: calc(100% - 150px);
+            top: 100px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-family: Arial;
+        }
+        .entry{
+            background-color: #32cd32;
+            width: calc(100% - 20px);
+            margin: 10px;
+            border-radius: 4px;
+        }
+        .entry:hover{
+            filter: brightness(85%);
+            cursor:pointer;
+        }
+        .public{
+          background-color: #cd8532;
+        }
+        .innertext{
+            display: inline-block;
+            margin: 0px;
+            padding: 8px;
+            font-size: 20px;
+        }
+        .buttonLib {
+            background-color: #32cd32;
+            border: none;
+            color: white;
+            padding: 7px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .buttonLib:hover{
+            filter: brightness(85%);
+        }
+        .headertextlib{
+            font-family: Arial;
+            color: #2d98b9;
+            padding-left: 10px;
+            margin: 7px 0px;
+            white-space:nowrap;
+        }
+        .inputlib{
+            background-color: #2d98b9;
+            border-radius: 8px;
+            border: none;
+            height: 35px;
+            width: 30%;
+            margin-left: 4px;
+            color: #185162;
+            font-size: 20px;
+        }
+        .selectlib{
+            background-color: #2d98b9;
+            border-radius: 8px;
+            border: none;
+            height: 35px;
+            width: 33%;
+            margin-left: 9px;
+            color: #185162;
+            font-size: 20px;
+        }
+        .selectlib:hover{
+            cursor: pointer;
+        }
+        .buttonSearchLib {
+            background-color: #2d98b9;
+            border-radius: 8px;
+            border: none;
+            height: 35px;
+            width: 80px;
+            margin-left: 4px;
+            color: #185162;
+            font-size: 20px;
+        }
+        .buttonSearchLib:hover{
+            cursor: pointer;
+            filter: brightness(85%)
+        }
+        .newsong{
+            display: none;
+            position: absolute;
+            padding: 0;
+            margin: 0px;
+            vertical-align:middle;
+            border-radius: 8px;
+            background-color: #185162;
+            width: 33%;
+            left: 33%;
+            height: calc(100% - 150px);
+            top: 100px;
+            overflow:hidden;
+            font-family: Arial;
+        }
 </style>
 </head>
 
@@ -39,24 +197,71 @@
 </div>
 <a id = 'homeparent' href="index.html" style="position: fixed;z-index:100;"></a>
 <a target="_blank" id = 'getcodeparent' href="maintenance.html"></a>
-  <h3 id="songinfo" style="position: absolute; top: -10px;text-align: left; color: white; width:200; left:920px;">Please wait...</h3>
-<div id="disab" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index:99;
-    display: none;
-    background-color:rgba(0,0,0,0.7)">
-    <h1 style="color:white; text-align:center;
-    margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-    "> Screen size too small for intended purpose</h1>
+  <h3 id="songinfo" style="position: absolute; top: -10px;text-align: left; color: white; width:200; left:920px; font-size:15px">London Bridge (6 bells)</h3>
+
+  <img onclick="hideSignin(); showLogin(); showCorrectLib()" src = 'res/login.png' id="Login" style="position: absolute; z-index: 98; top: 10px; color: black; right:8px;">
+  <img onclick="hideLogin(); showSignin()" src = 'res/signup.png' id="Signup" style="position: absolute; z-index: 98; top: 40px; color: black; right:8px;">
+  <p id='welcome' style="position: absolute; z-index: 98; top: 65px; color: black; right:1px;">Not signed in</p>
+  <button id='acctmenubtn' onclick="showAcctMenu()" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
+  <div id = 'acctmenu' class='newsong' style="height:300px">
+    <h1 class = "headertextlib">Account Settings</h1>
+    <div class="entries" style="width: calc(100% - 16px)">
+        <input id='delpword' placeholder="enter password" type="password" class="formbutton" style="margin:5px 5px 0px 5px; width:calc(100% - 10px)">
+        <button id='delbtn' onclick="deleteAcct()" class="formbutton" style="margin:5px 5px 0px 5px; background-color:#df3b27">Delete Account and Private Songs</button>
+    </div>
+    <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
+    <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
   </div>
+  <div id="Logindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%; padding-bottom: 20px; background-color:#185162">
+    <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px">Login to Handybells</h1>
+    <div class="container center">
+      <label for="uname"><b class = "center">Email</b></label>
+      <input id='emaillogin' class = "fullinput" type="text" placeholder="Enter Email" name="uname" required>
+
+      <label for="pswlogin"><b class = "center">Password</b></label>
+      <input id='pswlogin' class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
+
+      <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton">Login</button><button onclick="hideLogin()" class="formbutton">Cancel</button>
+    </div>
+  </div>
+  <div id="Signindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%;padding-bottom: 0px;background-color:#185162">
+    <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px; margin-bottom:0px">Create Handybells Account</h1>
+    <h3 id='error' style="font-family: 'Manjari', sans-serif; color:#FF5555; text-align: center; margin-top:0px"></h3>
+    <div class="container center">
+      <label><b class = "center smallertext">Email</b></label>
+      <input id="email" class = "fullinput" type="text" placeholder="Enter Email" name="uname" required>
+
+      <label><b class = "center smallertext">Password</b></label>
+      <input id="psw" class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
+
+      <label><b class = "center smallertext">Confirm Password</b></label>
+      <input id="psw2" class = "fullinput" type="password" placeholder="Re-enter Password" name="psw" required>
+
+      <label><b class = "center smallertext">Display Name</b></label>
+      <input id="dispname" class = "fullinput" type="text" placeholder="Enter Nickname" required>
+
+      <button id="signinenter" onclick="createAccount()" class="formbutton">Create Account</button><button onclick="hideSignin()" class="formbutton">Cancel</button>
+    </div>
+  </div>
+  <div id = 'library' class='library'>
+        <h1 class = "headertextlib">Cloud Song Library</h1>
+        <select class = "selectlib">
+            <option>Search By Title</option>
+            <option>Search Max Bell Count</option>
+            <option>Search Min Bell Count</option>
+            <option>Search By Creator</option>
+        </select>
+        <input class="inputlib" type="text" placeholder="Search.." name="search">
+        <button class="buttonSearchLib">Search</button>
+        <div id="entries" class="entries">
+          <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">The Wheels On The Bus (7 bells)</h1><h1 class="innertext"></h1></div>
+          <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">I'm A Little Tea Pot (7 bells)</h1><h1 class="innertext"></h1></div>
+          <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">Angels We Have Heard On High (6 bells)</h1><h1 class="innertext"></h1></div>
+          <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">London Bridge (6 bells)</h1><h1 class="innertext"></h1></div>
+        </div>
+        <button onclick="hideLib()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Cancel</button>
+        <button id='libmode' onclick="changeLibrary()" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px; display: none">Show Public Library</button>
+      <h2 id='message' style="position: absolute; bottom: -4px; left: 10px; font-size: 20px">Log in to see your songs, and the whole public library</h2>
+    </div>
 </body>
 </html>

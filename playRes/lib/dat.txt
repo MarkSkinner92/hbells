@@ -23,3 +23,8 @@ Away In A Manger,true,9,false
 Deck The Halls,true,9,false
 Frosty The Snowman,false,9,false
 God Rest Ye Merry Gentlemen,true,11,false
+
+The Wheels On The Bus,false,7,true
+I'm A Little Tea Pot,false,7,true
+Angels We Have Heard On High,true,6,false
+London Bridge,false,6,true

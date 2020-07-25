@@ -12,24 +12,22 @@ var mode = 0;//play mode 0 | song settings mode 1 |
 var tempoinput, tempoP, tempoM, backbar, barP, barM, download, upload, play, right, left, up, down, clear, home;
 var playbackbar = 0, playbackbeat = 0, playbacktime = 0, playbacktempotime = 500;
 //settings menu
-let nameinput, bars, pickups, opensettings, smok, smcancel;
-let settingsimg, cancelmenu = false;
+let nameinput, bars, pickups, smok, smcancel;
+let cancelmenu = false;
 let notesplayed = 0;
-let permited = false;
-//entercodemenu
-let code, ok, cancel, getcode;
-let codepanel, prompt, showprompt = false;
+let focused = true;
+let ineditmode = false;
+let ispublic = false;
+let prevbells = 0;
 
 var nv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 function preload(){
   panel = loadImage('composeRes/panel.png');
-  codepanel = loadImage('composeRes/codewindow.png');
   playhead=loadImage('composeRes/arrow.png');
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
   for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+nv[i]+'.wav');
-  settingsimg = loadImage('composeRes/settings.png');
   nameinput = createInput();
   nameinput.position(313,354);
   nameinput.size(216,31);
@@ -61,7 +59,7 @@ function setup() {
   upload.hide();
   download = createImg('composeRes/savefile.png');
   download.position(79,10);
-  download.mousePressed(BigD);
+  download.mousePressed(showSaver);
   play = createImg('composeRes/play.png');
   play.position(189,21);
   play.mousePressed(_play);
@@ -77,11 +75,8 @@ function setup() {
   down = createImg('composeRes/down.png');
   down.position(569,35);
   down.mousePressed(transposeDown);
-  opensettings = createImg('composeRes/opensettings.png');
-  opensettings.position(647,42);
-  opensettings.mousePressed(toggleSettings);
-  smok = createImg('composeRes/apply.png');
-  smok.mousePressed(_smok);
+  // smok = createImg('composeRes/apply.png');
+  // smok.mousePressed(_smok);
   smcancel = createImg('composeRes/cancel.png');
   smcancel.mousePressed(_smcancel);
   bars = createInput();
@@ -99,36 +94,16 @@ function setup() {
   pickupsP.mousePressed(_barsP);
   pickups.value(4);
   nameinput.value("new song");
-  clear = createImg('composeRes/clear.png');
-  clear.position(813,42);
-  clear.mousePressed(deleteAllNotes);
 
   faketimesig = Object.assign({}, timesig);
 
-  code = createImg('composeRes/entercode.png');
-  code.position(647, 8);
-  code.mousePressed(toggleCode);
   home = createImg('composeRes/home.png');
   home.position(12,14);
   home.parent('homeparent');
-
-  ok = createImg('composeRes/ok.png');
-  ok.mousePressed(okCode);
-  cancel = createImg('composeRes/cancel.png');
-  cancel.mousePressed(cancelCode);
-  getcode = createImg('composeRes/getcode.png');
-  getcode.parent('getcodeparent');
-  entercode = createInput();
-  entercode.attribute('type','password');
-  prompt = loadImage('composeRes/removelimit.png');
-  hideSettings();
-  hideCode();
-  styleSettings();
 }
 
 function draw() {
   playbacktempotime = 60000/timesig.tempo;
-  print(mouseX);
   textSize(12);
   timesig.tempo = tempoinput.value();
   if(timesig.tempo < 50) timesig.tempo = 50;
@@ -174,7 +149,7 @@ function draw() {
     mousenote=-1;
   }
   //draw selectorbar
-  if(mousenote != -1 && mode == 0){
+  if(mousenote != -1 && focused){
     noStroke();
     fill(220);
     let y = 100 + (mousenote/25.0)*(windowHeight-15-100);
@@ -264,47 +239,34 @@ function draw() {
   }
 
   if(mode == 1) drawSettings();
-  else if(mode == 2) showCodeMenu();
-  if(showprompt) image(prompt,812+Math.sin(millis()/200)*6,5);
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  styleSettings();
-}
-function styleSettings(){
-  if(windowWidth < 835 || windowHeight < 288){
-    document.getElementById('disab').style.display = 'block';
-  }
-  else document.getElementById('disab').style.display = 'none';
 }
 function mousePressed(){
   if(mode == 0){
-  if(mouseY > 100 && mouseY < windowHeight-15){//roll
+  if(mouseY > 105 && mouseY < windowHeight-15){//roll
     if(playback) _play();
     let ok = true;
       for(let i = 0; i < notedata.length; i++){
         let foo = notedata[i];
-        if(foo.p == mousenote && foo.bar == mousebar && foo.beat == mousebeat){
+        if(foo.p == mousenote && foo.bar == mousebar && foo.beat == mousebeat && focused){
           notedata.splice(i,1);
           ok = false;
         }
       }
-      if(ok){
-        if(mousebar < 8 || permited){
+      if(ok && focused){
           notedata.push({p:mousenote,bar:mousebar,beat:mousebeat});
           if(notesounds[mousenote]) notesounds[mousenote].play();
           notesplayed = 0;
-        }else{
-          showprompt = true;
         }
-      }
     }
   }
   if(cancelmenu){cancelmenu = false; mode = 0}
 }
 function keyPressed(){
-  if(key == ' '){
+  if(key == ' ' && focused){
     _play();
   }
 }
@@ -331,13 +293,25 @@ function playNotesAt(bar, beat){
   }
 }
 function BigD(){
+  let dt = getExportArray();
+  console.log(dt.join(','));
+  save(dt,timesig.name.replace(/ /g, "_")+'.txt');
+}
+function getSongString(){
+  return getExportArray().join(',');
+}
+function getExportArray(){
   let xport = [];
   let index = 8;
   let expfile = '';
   xport[0] = timesig.pickup;
   xport[1] = timesig.top;
   xport[2] = timesig.tempo;
-  xport[3] = timesig.name;
+
+  var counts = {};
+  for (var i = 0; i < notedata.length; i++) {counts[notedata[i].p] = 1 + (counts[notedata[i].p] || 0);}
+  xport[3] = Object.keys(counts).length;//bell count
+  if(xport[3] === undefined) xport[3] = 0;
   xport[4] = '';
   xport[5] = '';
   xport[6] = '';
@@ -350,14 +324,27 @@ function BigD(){
     xport[index] = notedata[i].beat;
     index++;
   }
-  save(xport,timesig.name.replace(/ /g, "_")+'.txt');
+  return xport;
 }
 function BigU(file) {
   let arr = file.data.split('\n');
   timesig.pickup = Number(arr[0]);
   timesig.top = Number(arr[1]);
   timesig.tempo = Number(arr[2]);
-  timesig.name = arr[3];
+  timesig.name = file.name.substring(0, file.name.length-4).replace(/_/g, " ");
+  notedata = [(arr.length-9)/3];
+  let index = 8;
+  for(let i = 0; i < (arr.length-9)/3; i++){
+    notedata[i] = {p:Number(arr[index]),bar:Number(arr[index+1]),beat:Number(arr[index+2])};
+    index+=3;
+  }
+}
+function setSongString(file){
+  let arr = file.split(',');
+  timesig.pickup = Number(arr[0]);
+  timesig.top = Number(arr[1]);
+  timesig.tempo = Number(arr[2]);
+  timesig.name = 'unnamed';
   notedata = [(arr.length-9)/3];
   let index = 8;
   for(let i = 0; i < (arr.length-9)/3; i++){
@@ -416,49 +403,19 @@ function toggleSettings(){
     mode = 1;
   }
 }
-function hideSettings(){
-  bars.hide();
-  pickups.hide();
-  smok.hide();
-  smcancel.hide();
-  nameinput.hide();
-  barsM.hide();
-  barsP.hide();
-  pickupsM.hide();
-  pickupsP.hide();
-}
 //song menu OK/apply and cancel
-function _smok(){
-  timesig.name = nameinput.value();
-  timesig.top = Number(pickups.value());
-  timesig.pickup = Number(bars.value());
-  hideSettings();
-  cancelmenu = true;
-}
+// function _smok(){
+//   timesig.name = nameinput.value().replace(/:/g, "_").replace(/,/g, "_");
+//   timesig.top = constrain(Number(pickups.value()),2,6);
+//   timesig.pickup = Number(bars.value());
+//   if(timesig.pickup == 0) timesig.pickup = timesig.top;
+//   timesig.pickup = constrain(timesig.pickup,1,timesig.top);
+//   hideSettings();
+//   cancelmenu = true;
+// }
 function _smcancel(){
   faketimesig = Object.assign({}, timesig);
-  hideSettings();
   cancelmenu = true;
-}
-
-function drawSettings(){
-  barsM.show();
-  barsP.show();
-  pickupsM.show();
-  pickupsP.show();
-  smok.show();
-  smcancel.show();
-  bars.show();
-  pickups.show();
-  image(settingsimg, windowWidth/2-130, 130);
-  smok.position(windowWidth/2-112,323);
-  smcancel.position(windowWidth/2+40,323);
-  nameinput.show();
-  nameinput.position(windowWidth/2-100,279);
-  bars.position(windowWidth/2-22,221);
-  pickups.position(windowWidth/2-22,161);
-  barsM.position(windowWidth/2-37,167);  barsP.position(windowWidth/2+17,169);
-  pickupsM.position(windowWidth/2-37,228);  pickupsP.position(windowWidth/2+17,228);
 }
 function _tempoM(){
   tempoinput.value(Number(tempoinput.value())-1);
@@ -491,41 +448,357 @@ function deleteAllNotes(){
     cm = 1;
   }
 }
-function toggleCode(){
-  if(mode == 0) mode = 2;
+function hideLogin() {
+  document.getElementById("Logindiv").style.display = "none";
+  focused = true;
 }
-function cancelCode(){
-  cancelmenu = true;
-  hideCode();
+function showLogin() {
+  hideLib();
+  focused = false;
+  let imgsrc = document.getElementById('Login').src;
+  if(imgsrc.substr(imgsrc.length-5) == 'n.png'){
+    document.getElementById("Logindiv").style.display = "inline";
+  }else{
+    console.log('signing out...');
+    firebase.auth().signOut().then(function() {
+      // Sign-out successful.
+      document.getElementById('Login').src = 'res/login.png';
+    }).catch(function(error) {
+      // An error happened.
+      console.log('could not sign out: '+error);
+    });
+  }
 }
-function okCode(){
-  cancelmenu = true;
-  var d = new Date();
-  if(entercode.value() == (d.getMonth()*361+(d.getFullYear()*0xF3)-450000).toString(16)) permited = true;
-  hideCode();
+function hideSignin() {
+  document.getElementById("Signindiv").style.display = "none";
+  focused = true;
 }
-function showCodeMenu(){
-  image(codepanel, windowWidth/2-155, 130);
-  cancel.show();
-  ok.show();
-  getcode.show();
-  entercode.show();
-  entercode.position(windowWidth/2-68,177);
-  entercode.size(131,28);
-  ok.position(windowWidth/2-127,215);
-  getcode.position(windowWidth/2-45,215);
-  cancel.position(windowWidth/2+58,215);
-  showprompt = false;
+function showSignin() {
+  document.getElementById("Signindiv").style.display = "inline";
+  hideLib();
+  hideAcctMenu();
+  focused = false;
 }
-function hideCode(){
-  cancel.hide();
-  ok.hide();
-  getcode.hide();
-  entercode.hide();
+function showLib(){
+  hideNewSong();
+  hideAcctMenu();
+  focused = false;
+  document.getElementById('lib').style.display = 'inline';
+  document.getElementById('openlib').style.display = 'none';
 }
-window.addEventListener("beforeunload", function (e) {
-    var confirmationMessage = 'If you leave before saving, your composition will be lost';
+function hideLib(){
+  document.getElementById('lib').style.display = 'none';
+  document.getElementById('openlib').style.display = 'inline';
+  focused = true;
+}
+function showNewSong(){
+  hideLib();
+  hideAcctMenu();
+  focused = false;
+  document.getElementById('newsong').style.display = 'inline';
+}
+function hideNewSong(){
+  focused = true;
+  document.getElementById('newsong').style.display = 'none';
+}
+function showSaver(){
+  hideLib();
+  hideAcctMenu();
+  focused = false;
+  document.getElementById('saver').style.display = 'inline';
+}
+function hideSaver(){
+  focused = true;
+  document.getElementById('saver').style.display = 'none';
+}
+function setupNewSong(){
+  let validsongname="";
+  var name = document.createElement("H1");
+  validsongname = document.getElementById('newsongname').value;
+  name.innerHTML = validsongname;
+  name.className = "innertext";
+  var info = document.createElement("H1");
+  info.innerHTML = "";
+  info.className = "innertext";
+  var entry = document.createElement("DIV");
+  entry.appendChild(name);
+  entry.appendChild(info);
+  entry.className = "entry";
+  entry.id='songthumb';
+  entry.addEventListener("click", clickedOnSong);
+  openSongEditMenu(entry);
+  document.getElementById("entries").appendChild(entry);
+  let usr = firebase.auth().currentUser;
+  let currentUserDocData;
+  var docRef = db.collection("Users").doc(usr.uid);
+  docRef.get().then(function(doc) {
+    currentUserDocData=doc.data();
+    let newusrdata = currentUserDocData.data + validsongname+':0'+',';// 0 means private, 1 means public
+    if(usr){
+      docRef.set({
+        data: newusrdata,
+      }).then(function(){
+        db.collection("Songs").doc(validsongname+':'+usr.displayName+':'+usr.uid).set({
+          data: timesig.pickup+','+timesig.top+',100,,,,,'
+        });
+        document.getElementById('openlib').innerHTML = 'Save and Return';
+        document.getElementById('songtitleinlib').innerHTML = validsongname.split(':')[0];
+        ineditmode = true;
+        document.getElementById('editingname').style.display = 'inline';
+        document.getElementById('btn').style.display = 'inline';
+      });
+    }
+  }).catch(function(error) {
+      console.log("Error getting user specific document:", error);
+  });
+}
+function clickedOnSong(e){
+  console.log('clicked on ' + e.target);
+  if(e.target.nodeName == 'H1'){
+    openSongEditMenu(e.target.parentElement);
+  }
+  else openSongEditMenu(e.target);
+}
+function openSongEditMenu(targetdom){
+  let btn = document.getElementById('gopublic');
+  document.getElementById('liboptions').style.display = 'inline';
+  document.getElementById('songtitleinlib').innerHTML = targetdom.firstChild.innerHTML;
+  console.log('this song is public: ' + hasClass(targetdom, 'public'));
+  ispublic = hasClass(targetdom, 'public');
+  if(hasClass(targetdom, 'public')) btn.innerHTML = 'Make Private';
+  else btn.innerHTML = 'Make Public';
+  document.getElementById('deletesong').innerHTML = "Delete Forever";
+}
+//save file to web button (save -> save to web menu)
+function uploadOnline(){
+  hideSaver();
+  let usr = firebase.auth().currentUser;
+  //ineditmode -> are we currently editing a song from the library?
+  if(ineditmode){
+    //save to database and return to console
+    let songstring = getSongString();
+    if(usr){
+      if(ispublic){
+        db.collection("Songlists").doc("list1").get().then(function(list){
+          let bells = songstring.split(',')[3];
+          console.log(ispublic, prevbells, bells)
+          let songlist = list.data().data.replace((songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(prevbells)+','),(songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(bells)+','));
+          db.collection("Songlists").doc("list1").set({
+            data: songlist,
+          });
+        }).catch(function(e){
+          console.log('in uploadOnline: '+e);
+        });
+      }
 
-    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-});
+      let songname = document.getElementById('songtitleinlib').innerHTML;
+      db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).set({
+        data: songstring,
+      }).then(function(){
+        deleteAllNotes();
+      });
+    }
+    showLib();
+    ineditmode = false;
+    document.getElementById('editingname').style.display = 'none';
+    document.getElementById('btn').style.display = 'none';
+    document.getElementById('openlib').innerHTML = 'Open Library';
+  }
+  else if(usr){
+    //upload song right to library
+    showLib();
+  }else{
+    //set some flag that will upload the song after they authenticate
+    showLogin();
+  }
+}
+function editsong(){
+  ineditmode=true;
+  document.getElementById('editingname').style.display = 'inline';
+  document.getElementById('btn').style.display = 'inline';
+  usr = firebase.auth().currentUser;
+  timesig.name = document.getElementById('songtitleinlib').innerHTML;
+  //load song from database
+  document.getElementById('editingname').innerHTML = 'Editing: ' +timesig.name;
+  console.log(timesig.name+':'+usr.displayName+':'+usr.uid);
+  var docRef = db.collection("Songs").doc(timesig.name+':'+usr.displayName+':'+usr.uid);
+  docRef.get().then(function(doc) {
+    songDocData=doc.data();
+    prevbells = songDocData.data.split(',')[3];
+    setSongString(songDocData.data);
+    hideLib();
+    document.getElementById('openlib').innerHTML = 'Save and Return';
+  }).catch(function(e){
+    console.log('could not open song' + e);
+  });
+}
+function newsong(){
+  let a = document.getElementById('bpb').value;
+  let b = document.getElementById('pb').value;
+  let c = document.getElementById('newsongname').value;
+  if(a.length > 0 && b.length > 0 && c.length > 0){
+    timesig.top = constrain(parseInt(a),2,6);
+    timesig.pickup = parseInt(b);
+    if(timesig.pickup == 0) timesig.pickup = timesig.top;
+    timesig.pickup = constrain(timesig.pickup,1,timesig.top);
+    setupNewSong();
+    editsong();
+    hideNewSong();
+  }
+}
+function deletesong(){
+  let usr = firebase.auth().currentUser;
+  let songname = document.getElementById('songtitleinlib').innerHTML;
+  if(document.getElementById('deletesong').innerHTML == "Are you sure?"){
+    console.log('deleting song...');
+    if(ispublic) makePrivate(true);
+    else{
+      db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).delete().then(function() {
+      console.log("Song doc successfully deleted!");
+      //delete personal song index .replace('song name','');
+      var docRef = db.collection("Users").doc(usr.uid);
+      docRef.get().then(function(doc) {
+        currentUserDocData=doc.data();
+        let newusrdata = currentUserDocData.data.replace(songname+':0'+',','').replace(songname+':1'+',','');
+        if(usr){
+          docRef.set({
+            data: newusrdata,
+          }).then(function(){
+            console.log('song successful removed from private library');
+            var thumbs = document.getElementsByClassName("entry");
+            for (var i = 0; i < thumbs.length; i++) {
+              if(thumbs[i].firstChild.innerHTML == songname){
+                thumbs[i].remove();
+                i--;
+              }
+            }
+            document.getElementById('liboptions').style.display = 'none';
+            document.getElementById('songtitleinlib').innerHTML = '';
+          });
+        }
+      });
+    });
+  }
+  }
+  document.getElementById('deletesong').innerHTML = "Are you sure?";
+}
+function makePrivate(deleteAfter){
+  let btn = document.getElementById('gopublic');
+  let songname = document.getElementById('songtitleinlib').innerHTML;
+  var docRef = db.collection("Songlists").doc("list1");
+  let songdat='';
+  docRef.get().then(function(doc) {
+    songdat=doc.data().data;//songlist
+    let cu = firebase.auth().currentUser;
+    db.collection("Songs").doc(songname+':'+cu.displayName+':'+cu.uid).get().then(function(doc){
+      //delete the song from the public songlists
+      console.log((songname+':'+cu.displayName+':'+cu.uid+':'+parseInt(doc.data().data.split(',')[3])+','));//real
+      let songlist = songdat.replace((songname+':'+cu.displayName+':'+cu.uid+':'+parseInt(doc.data().data.split(',')[3])+','),'');//fake
+      console.log(songlist);
+        docRef.set({
+          data: songlist,
+        }).then(function(){
+          let docRef = db.collection("Users").doc(cu.uid);
+          docRef.get().then(function(doc) {
+            currentUserDocData=doc.data();
+            let newusrdata = currentUserDocData.data.replace(songname+':1',songname+':0');// 0 means private, 1 means public
+              docRef.set({
+                data: newusrdata,
+              }).then(function(){
+                let els = document.getElementsByClassName('entry');
+                for(let i = 0; i < els.length; i++){
+                  if(els[i].firstChild.innerHTML == songname){
+                    els[i].className = 'entry';
+                  }
+                }
+                console.log('song is now private');
+                btn.innerHTML = 'Make Public';
+                if(deleteAfter){
+                  db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).delete().then(function() {
+                    console.log("Song doc successfully deleted!");
+                    //delete personal song index .replace('song name','');
+                    var docRef = db.collection("Users").doc(usr.uid);
+                    docRef.get().then(function(doc) {
+                      currentUserDocData=doc.data();
+                      let newusrdata = currentUserDocData.data.replace(songname+':0'+',','').replace(songname+':1'+',','');
+                      if(usr){
+                        docRef.set({
+                          data: newusrdata,
+                        }).then(function(){
+                          console.log('song successful removed from private library');
+                          var thumbs = document.getElementsByClassName("entry");
+                          for (var i = 0; i < thumbs.length; i++) {
+                            if(thumbs[i].firstChild.innerHTML == songname){
+                              thumbs[i].remove();
+                              i--;
+                            }
+                          }
+                          document.getElementById('liboptions').style.display = 'none';
+                          document.getElementById('songtitleinlib').innerHTML = '';
+                        });
+                      }
+                    });
+                  });
+                }
+                return;
+              });
+          });
+        });
+      });
+  });
+}
+function goPublic(){
+  let btn = document.getElementById('gopublic');
+  let songname = document.getElementById('songtitleinlib').innerHTML;
+  if(btn.innerHTML == 'Make Public'){
+    btn.innerHTML = 'Click to Confirm';
+  }else{
+    if(btn.innerHTML == 'Make Private'){
+      //make the song private
+      makePrivate(false);
+    }
+    else{
+      console.log('making song public...');
+      ispublic = true;
+      //add song name to songlist
+      var docRef = db.collection("Songlists").doc("list1");
+      let songdat='';
+      docRef.get().then(function(doc) {
+        songdat=doc.data().data;
+        let cu = firebase.auth().currentUser;
+        db.collection("Songs").doc(songname+':'+cu.displayName+':'+cu.uid).get().then(function(doc){
+          let songlist = songdat+songname+':'+cu.displayName+':'+cu.uid+':'+parseInt(doc.data().data.split(',')[3])+',';
+            docRef.set({
+              data: songlist,
+            }).then(function(){
+              let docRef = db.collection("Users").doc(cu.uid);
+              docRef.get().then(function(doc) {
+                currentUserDocData=doc.data();
+                let newusrdata = currentUserDocData.data.replace(songname+':0',songname+':1');// 0 means private, 1 means public
+                  docRef.set({
+                    data: newusrdata,
+                  }).then(function(){
+                    let els = document.getElementsByClassName('entry');
+                    for(let i = 0; i < els.length; i++){
+                      if(els[i].firstChild.innerHTML == songname){
+                        els[i].className = 'entry public';
+                      }
+                    }
+                    console.log('song is now public');
+                    btn.innerHTML = 'Make Private';
+                  });
+              });
+            });
+          });
+      });
+    }
+  }
+}
+function noUserSignedIn(){
+  document.getElementById('entries').innerHTML = '';
+  document.getElementById('openlib').style.display='none';
+  document.getElementById('acctmenubtn').style.display='none';
+  document.getElementById('welcome').innerHTML='Not signed in';
+  console.log("not logged in yet");
+  document.getElementById('Login').src = 'res/login.png';
+}

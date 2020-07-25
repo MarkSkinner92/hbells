@@ -10,6 +10,12 @@
   <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/addons/p5.sound.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-analytics.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manjari&display=swap" rel="stylesheet">
+  <script src="firestuff.js"></script>
   <script language="javascript" type="text/javascript" src="compose.js"></script>
   <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
 
@@ -30,7 +36,181 @@
       filter: brightness(85%);
     }
     html, body { overflow: hidden };
+
+    /* signin stuff */
+    .smallertext{
+      font-size: 17px;
+    }
+  .formbutton {
+    background-color: #7edf27;
+    color: black;
+    padding: 14px 20px;
+    margin: 8px 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'Manjari', sans-serif;
+    font-size: 20px
+  }
+  .fullinput {
+  text-align: center;
+  width: 90%;
+  padding: 12px 20px;
+  margin: 5px auto 2vh auto;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: 'Manjari', Arial;
+  }
+  .center{
+    text-align: center;
+    font-family: 'Manjari', Arial;
+    font-size: 25px;
+  }
 </style>
+<style>
+    .library{
+        display: none;
+        position: absolute;
+        padding: 0;
+        margin: 0px;
+        vertical-align:middle;
+        border-radius: 8px;
+        background-color: #185162;
+        width: 80%;
+        left: 10%;
+        height: calc(100% - 150px);
+        top: 100px;
+        overflow:hidden;
+        font-family: Arial;
+    }
+    .entries{
+        display: inline;
+        position: absolute;
+        padding: 0;
+        margin: 0px;
+        vertical-align:middle;
+        border-radius: 8px;
+        background-color: #2d98b9;
+        width: calc(50% - 12px);
+        left: 8px;
+        height: calc(100% - 120px);
+        top: 70px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        font-family: Arial;
+    }
+    .control{
+        display: inline;
+        position: absolute;
+        padding: 0;
+        margin: 0px;
+        vertical-align:middle;
+        border-radius: 8px;
+        background-color: #2d98b9;
+        width: calc(50% - 12px);
+        right: 8px;
+        height: calc(100% - 120px);
+        top: 70px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        font-family: Arial;
+    }
+    .entry{
+        background-color: #9232cd;
+        width: calc(100% - 20px);
+        margin: 10px;
+        border-radius: 4px;
+    }
+    .public{
+      background-color: #cd8532;
+    }
+    .entry:hover{
+        filter: brightness(85%);
+        cursor:pointer;
+    }
+    .innertext{
+        display: inline-block;
+        margin: 0px;
+        padding: 8px;
+        font-size: 20px;
+    }
+    .buttonLib {
+        background-color: #32cd32;
+        border: none;
+        color: white;
+        padding: 7px 20px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+    .buttonLib:hover{
+        filter: brightness(85%);
+    }
+    .headertextlib{
+        font-family: Arial;
+        color: #2d98b9;
+        padding-left: 10px;
+        margin: 16px 0px;
+        white-space:nowrap;
+    }
+    .add{
+        position: fixed;
+        left:calc(50% - 54px);
+        bottom:105px;
+    }
+    .add:hover{
+        cursor: pointer;
+        filter:brightness(85%);
+    }
+    .ctrlbutton{
+        width: calc(100% - 20px);
+        height: 45px;
+        margin-left: 10px;
+        background-color: #93eb93;
+        border: 0px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        color:black;
+        font-size: 20px;
+        font-family: Arial;
+    }
+    .ctrlbutton:hover{
+        cursor: pointer;
+        filter:brightness(85%);
+    }
+/*        addsong menu*/
+    .newsong{
+        display: none;
+        position: absolute;
+        padding: 0;
+        margin: 0px;
+        vertical-align:middle;
+        border-radius: 8px;
+        background-color: #185162;
+        width: 33%;
+        left: 33%;
+        height: calc(100% - 150px);
+        top: 100px;
+        overflow:hidden;
+        font-family: Arial;
+    }
+    .inputmenu{
+        width: calc(100% - 10px);
+        margin: 5px 5px 0px 5px;
+        height: 40px;
+        background-color: #6def6d;
+        border-radius: 5px;
+        border: none;
+    }
+    .btn:hover{
+      cursor: pointer;
+      filter:brightness(85%);
+    }
+    </style>
 </head>
 
 <body>
@@ -41,25 +221,89 @@
     top: 41px;"/>
   </label>
 </div>
-<a id = 'homeparent' href="index.html" style="position: fixed;z-index:100;"></a>
-<a target="_blank" id = 'getcodeparent' href="maintenance.html"></a>
-<div id="disab" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index:99;
-    display: none;
-    background-color:rgba(0,0,0,0.7)">
-    <h1 style="color:white; text-align:center;
-    margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-    "> Screen size too small for intended purpose</h1>
+<img onclick="hideSignin(); showLogin()" src = 'res/login.png' id="Login" style="position: absolute; z-index: 98; top: 10px; color: black; right:8px;">
+<img onclick="hideLogin(); showSignin()" src = 'res/signup.png' id="Signup" style="position: absolute; z-index: 98; top: 40px; color: black; right:8px;">
+<p id='welcome' style="position: absolute; z-index: 98; top: 0px; color: #FFF; right:105px; font-family: Arial">Not signed in</p>
+<p id='editingname' style="display: none; position: absolute; top: 0px; color: #FFF; left:646px; font-family: Arial">Editing: unnamed</p>
+<button id='acctmenubtn' onclick="showAcctMenu();hideNewSong();hideSaver();focused = false" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
+<div id = 'acctmenu' class='newsong' style="height:300px">
+  <h1 class = "headertextlib">Account Settings</h1>
+  <div class="entries" style="width: calc(100% - 16px)">
+      <input id='delpword' placeholder="enter password" type="password" class="formbutton btn" style="margin:5px 5px 0px 5px; width:calc(100% - 10px)">
+      <button id='delbtn' onclick="deleteAcct()" class="formbutton btn" style="margin:5px 5px 0px 5px; background-color:#df3b27">Delete Account and Private Songs</button>
   </div>
+  <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
+  <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
+</div>
+<div id="Logindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 180px; left: 25%; width: 50%; padding-bottom: 20px; background-color:#185162">
+  <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px">Login to Handybells</h1>
+  <div class="container center">
+    <label for="uname"><b class = "center">Email</b></label>
+    <input id='emaillogin' class = "fullinput" type="text" placeholder="Enter Email" name="uname" required>
+
+    <label for="pswlogin"><b class = "center">Password</b></label>
+    <input id='pswlogin' class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
+
+    <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton btn">Login</button><button onclick="hideLogin()" class="formbutton btn">Cancel</button>
+  </div>
+</div>
+<div id="Signindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%;padding-bottom: 0px;background-color:#185162">
+  <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px; margin-bottom:0px">Create Handybells Account</h1>
+  <h3 id='error' style="font-family: 'Manjari', sans-serif; color:#FF5555; text-align: center; margin-top:0px"></h3>
+  <div class="container center">
+    <label><b class = "center smallertext">Email</b></label>
+    <input id="email" class = "fullinput" type="text" placeholder="Enter Email" name="uname" required>
+
+    <label><b class = "center smallertext">Password</b></label>
+    <input id="psw" class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
+
+    <label><b class = "center smallertext">Confirm Password</b></label>
+    <input id="psw2" class = "fullinput" type="password" placeholder="Re-enter Password" name="psw" required>
+
+    <label><b class = "center smallertext">Display Name</b></label>
+    <input id="dispname" class = "fullinput" type="text" placeholder="Enter Nickname" required>
+
+    <button id="signinenter" onclick="createAccount()" class="formbutton btn">Create Account</button><button onclick="hideSignin()" class="formbutton btn btn">Cancel</button>
+  </div>
+</div>
+<a id = 'homeparent' href="index.html" style="position: fixed;z-index:100;"></a>
+<div id='lib' class='library'>
+  <h1 class = "headertextlib">My Song Library</h1>
+  <div id="entries" class="entries"></div>
+  <div id="control" class="control">
+     <div id='liboptions' style="padding: 0; margin: 0; border: none; display:none">
+         <h1 id='songtitleinlib' style="text-align: center; font-family: Arial; color: #081f26; font-size: 20px">Song Name and song title if its a long name</h1>
+         <button onclick="editsong();"class="ctrlbutton">Edit Song</button>
+         <!-- <button class="ctrlbutton">Download</button> -->
+         <button id='gopublic' onclick="goPublic()" class="ctrlbutton" style="background-color: #e69494">Make Public</button>
+         <button onclick="deletesong()" id='deletesong' class="ctrlbutton" style="background-color: #e69494">Delete Forever</button>
+     </div>
+  </div>
+  <img class="add" onClick="showNewSong()" src="composeRes/addicon.png">
+  <button onclick="hideLib()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Close Library</button>
+  <!-- <button class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Upload</button> -->
+</div>
+<div id = 'newsong' class='newsong'>
+       <h1 class = "headertextlib">New Song</h1>
+       <div class="entries" style="width: calc(100% - 16px)">
+           <h3 style="color:#F00;margin:5px">You can't change this later</h3>
+           <input id='bpb'class="inputmenu" type="text" placeholder="Beats Per Bar ex. 4">
+           <input id='pb'class="inputmenu" type="text" placeholder="Pickup Beats ex. 4">
+           <input id="newsongname" class="inputmenu" type="text" placeholder="Name of song">
+       </div>
+       <button onclick="newsong()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
+       <button onclick="showLib()" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
+   </div>
+<div id = 'saver' class='newsong' style="height:300px">
+  <h1 class = "headertextlib">Save Current Song</h1>
+  <div class="entries" style="width: calc(100% - 16px)">
+      <button onclick="BigD()" class="formbutton btn btn" style="margin:5px 5px 0px 5px">Save as file</button>
+      <!-- <button onclick="uploadOnline()" class="formbutton btn" style="margin:5px 5px 0px 5px">Upload to online library</button> -->
+  </div>
+  <button onclick="hideSaver();" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
+  <button onclick="hideSaver();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
+</div>
+<button id='openlib' class="btn" onclick="uploadOnline()" style="position:absolute; display: none;top: 40px; left: 646px; background-color: #27dfde; color:#000; border:none; border-radius:5px; width:153px;height:27px;">Open My Library</button>
+<button id='btn' class="btn" onclick="deleteAllNotes()" style="display: none; position:absolute; top: 40px; left: 805px; background-color: #df3b27; color:#FFF; border:none; border-radius:5px; width:140px;height:27px;">Delete All Notes</button>
 </body>
 </html>
