@@ -619,14 +619,24 @@ function openSongFromDiv(targetdom){
     hideLib();
   }
   else{
-    var docRef = db.collection("Songs").doc(timesig.name.split(',')[0]+':'+usr.displayName+':'+usr.uid);
+    let songlookup = timesig.name.split(',')[0]+':'+usr.displayName+':'+usr.uid;
+    try{
+      songlookup = targetdom.querySelector("#path").innerText.split(':');
+      songlookup.pop();
+      songlookup = songlookup.join(':');
+    }
+    catch{
+      console.log('using local songlookup');
+    }
+    console.log('song im looking for',songlookup);
+    var docRef = db.collection("Songs").doc(songlookup);
     docRef.get().then(function(doc) {
       songDocData=doc.data();
       console.log('loading song');
       loadSong(songDocData.data.split(','));
       hideLib();
     }).catch(function(e){
-      console.log('no song doc exists with that name   ' + timesig.name+':'+usr.displayName+':'+usr.uid);
+      console.log('no song doc exists with that name   ' + songlookup,e);
     });
   }
 }
@@ -663,9 +673,14 @@ function genPublicThumbs(){
       var info = document.createElement("H1");
       info.innertext = "";
       info.className = "innertext";
+      var path = document.createElement("H3");
+      path.style.display = 'none';
+      path.id='path';
+      path.innerText = names[i];
       var entry = document.createElement("DIV");
       entry.appendChild(name);
       entry.appendChild(info);
+      entry.appendChild(path);
       entry.className = 'entry public cloud';
       entry.id='songthumb';
       entry.addEventListener("click", clickedOnSong);

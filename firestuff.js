@@ -47,22 +47,29 @@ var firebaseConfig = {
       msg="Display name too short";
     }
     usrname = disp;
-    if(verif) auth.createUserWithEmailAndPassword(email, password).then(function(result) {
+    if(verif){ auth.createUserWithEmailAndPassword(email, password).then(function(result) {
       console.log('created account');
-      console.log("creating songlist document: Users/"+result.user.uid);
-      db.collection("Users").doc(result.user.uid).set({songplays: 5, data:''}); //add user specific document
+      // console.log("creating songlist document: Users/"+result.user.uid);
+      // db.collection("Users").doc(result.user.uid).set({songplays: 10, data:''}).then(function(re){
+      //   console.log('DOCUMENT WAS CREATED',re);
+      // }).catch(function(e){
+      //   console.log("couldn't make user document: "+e);
+      // }); //add user specific document
       hideSignin();
     return result.user.updateProfile({displayName: disp});
   }).catch(function(error) {
       // Handle Errors here.
       var errorCode = error.code;
       var errorMessage = error.message;
+      console.log('something bad happened: ');
       console.log(errorCode, errorMessage);
       if(errorCode == 'auth/email-already-in-use') msg = 'Email alreay in use';
       if(errorCode == 'auth/invalid-email') msg = 'Enter a valid email'
       document.getElementById('error').innerHTML = msg;
     });
+    }
     else{
+      console.log('varif was false');
       document.getElementById('error').innerHTML = msg;
     }
   }
@@ -93,7 +100,7 @@ auth.onAuthStateChanged(function(user) {
     //add personal songs to Library
     let currentUserDocData;
     var docRef = db.collection("Users").doc(usr.uid);
-    console.log('getting doc... ' + docRef);
+    console.log('getting doc... ' + usr.uid);
     docRef.get().then(function(doc) {
       currentUserDocData=doc.data();
       //loop through all songs and create thumbs
@@ -120,6 +127,13 @@ auth.onAuthStateChanged(function(user) {
       try{genPublicThumbs();}catch(err){}
     }).catch(function(error) {
         console.log("couldn't get doc" + error);
+        console.log("creating songlist document: Users/"+usr.uid);
+        db.collection("Users").doc(usr.uid).set({songplays: 10, data:''}).then(function(re){
+          console.log('DOCUMENT WAS CREATED',re);
+          try{genPublicThumbs();}catch(err){}
+        }).catch(function(e){
+          console.log("couldn't make user document: "+e);
+        }); //add user specific document
     });
     showLib();
   } else {

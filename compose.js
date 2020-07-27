@@ -714,14 +714,14 @@ function makePrivate(deleteAfter){
                 console.log('song is now private');
                 btn.innerHTML = 'Make Public';
                 if(deleteAfter){
-                  db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).delete().then(function() {
+                  db.collection("Songs").doc(songname+':'+cu.displayName+':'+cu.uid).delete().then(function() {
                     console.log("Song doc successfully deleted!");
                     //delete personal song index .replace('song name','');
-                    var docRef = db.collection("Users").doc(usr.uid);
+                    var docRef = db.collection("Users").doc(cu.uid);
                     docRef.get().then(function(doc) {
                       currentUserDocData=doc.data();
                       let newusrdata = currentUserDocData.data.replace(songname+':0'+',','').replace(songname+':1'+',','');
-                      if(usr){
+                      if(cu){
                         docRef.set({
                           data: newusrdata,
                         }).then(function(){
