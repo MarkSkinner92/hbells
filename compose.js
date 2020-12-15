@@ -512,7 +512,7 @@ function hideSaver(){
   document.getElementById('saver').style.display = 'none';
 }
 function cleanSongName(name){
-  return name.replace(/[^a-zA-Z0-9]/g, '');
+  return name.replace(/[^a-zA-Z0-9\s_]/g, '');
 }
 function setupNewSong(){
   let validsongname="";
