@@ -511,10 +511,13 @@ function hideSaver(){
   focused = true;
   document.getElementById('saver').style.display = 'none';
 }
+function cleanSongName(name){
+  return name.replace(/[^a-zA-Z0-9]/g, '');
+}
 function setupNewSong(){
   let validsongname="";
   var name = document.createElement("H1");
-  validsongname = document.getElementById('newsongname').value;
+  validsongname = cleanSongName(document.getElementById('newsongname').value);
   name.innerHTML = validsongname;
   name.className = "innertext";
   var info = document.createElement("H1");
