@@ -5,7 +5,7 @@ let tickrate = 5;
 let notedata = [], noteindex = [25], notesused = [], notetostaff=[], bbl=[];//bbl bar beat list notation is a 2d array storing lists for evry beat of what notes are played at that beat
 let playback = false, playbackbar, playbackbeat = 0, playbacktime = 0, playbacktempotime, lasttime = 0, playbackcount = 0, playbackmax = 0;
 let paused = false, playsound = true;
-let songinthehouse = false, horzon = true; //if false, the staves will be verticaly alligned
+let songinthehouse = false, horzon = false; //if false, the staves will be verticaly alligned
 let timesig = {top:4,pickup:4,tempo:120,name:"Load song with buttons above"};
 let onv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 let nv = ['G5','F#5','F5','E5','D#5','D5','C#5','C5','B4','A#4','A4','G#4','G4','F#4','F4','E4','D#4','D4','C#4','C4','B3','A#3','A3','G#3','G3'];
@@ -226,7 +226,7 @@ function loadSong(data){
       notetostaff[i]=notesused.length-1;//lookup table from note # to staves[] index
     }
   }
-  horzon = (notesused.length>8)?false:true;
+  //horzon = !(notesused.length>8) //use this if you want it vertically aligned if there is less than 8 bells
   staves = [];
   let len = notesused.length;
   for(let i = 0; i < len; i++){
