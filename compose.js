@@ -366,8 +366,8 @@ function _play(){
   if(mode == 0){
     if(playback){
       playback = false;
-      playbackbar = 0;
-      backbar.value(1);
+      playbackbar = cm-1;
+      backbar.value(cm);
       playbackbeat = 0;
       playbacktime = 0;
       play.attribute('src', 'composeRes/play.png');
@@ -636,10 +636,10 @@ function editsong(){
   });
 }
 function newsong(){
-  let a = document.getElementById('bpb').value;
-  let b = document.getElementById('pb').value;
+  let a = document.getElementById('bpb').value || 4;
+  let b = document.getElementById('pb').value || 0;
   let c = document.getElementById('newsongname').value;
-  if(a.length > 0 && b.length > 0 && c.length > 0){
+  if(c.length > 0){
     timesig.top = constrain(parseInt(a),2,6);
     timesig.pickup = parseInt(b);
     if(timesig.pickup == 0) timesig.pickup = timesig.top;
@@ -652,7 +652,7 @@ function newsong(){
 function deletesong(){
   let usr = firebase.auth().currentUser;
   let songname = document.getElementById('songtitleinlib').innerHTML;
-  if(document.getElementById('deletesong').innerHTML == "Are you sure?"){
+  if(document.getElementById('deletesong').innerHTML == "Click again to confirm"){
     console.log('deleting song...');
     if(ispublic) makePrivate(true);
     else{
@@ -805,3 +805,7 @@ function noUserSignedIn(){
   console.log("not logged in yet");
   document.getElementById('Login').src = 'res/login.png';
 }
+//prompt user before leaving
+window.onbeforeunload = function() {
+    return true;
+};
