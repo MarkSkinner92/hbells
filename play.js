@@ -21,7 +21,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   attatchDemoClickListeners();
   textStyle(BOLD);
-  for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+onv[i]+'.wav');
+  for(let i = 0; i < 25; i++) notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
   songinput = createFileInput(getFile);
   songinput.position(6,6);
   songinput.size(96,30);
@@ -321,8 +321,8 @@ class Staff {
     }
     if(this.notes[length-1] >= hitx){
       if(playsound){
-        if(isNaN(transposeinput.value())) notesounds[n].play();
-        else notesounds[n-Number(transposeinput.value())].play();
+        if(isNaN(transposeinput.value())) notesounds[n].cloneNode(true).play();
+        else notesounds[n-Number(transposeinput.value())].cloneNode(true).play();
       }
       playbackcount++;
       this.notes.pop();

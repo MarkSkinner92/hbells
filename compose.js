@@ -27,7 +27,7 @@ function preload(){
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  for(let i = 0; i < 25; i++) notesounds[i] = loadSound('sounds/'+nv[i]+'.wav');
+  for(let i = 0; i < 25; i++) notesounds[i] = new Audio('sounds/'+nv[i]+'.wav');
   nameinput = createInput();
   nameinput.position(313,354);
   nameinput.size(216,31);
@@ -258,7 +258,7 @@ function mousePressed(){
       }
       if(ok && focused){
           notedata.push({p:mousenote,bar:mousebar,beat:mousebeat});
-          if(notesounds[mousenote]) notesounds[mousenote].play();
+          if(notesounds[mousenote]) notesounds[mousenote].cloneNode(true).play();
           notesplayed = 0;
         }
     }
@@ -287,7 +287,7 @@ function playNotesAt(bar, beat){
   for(let i = 0; i < notedata.length; i++){
     let foo = notedata[i];
     if(foo.bar == bar && foo.beat == beat){
-      if(notesounds[foo.p]) notesounds[foo.p].play();
+      if(notesounds[foo.p]) notesounds[foo.p].cloneNode(true).play();
       if(playback)notesplayed++;
     }
   }
