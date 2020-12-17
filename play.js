@@ -226,7 +226,7 @@ function loadSong(data){
       notetostaff[i]=notesused.length-1;//lookup table from note # to staves[] index
     }
   }
-  //horzon = !(notesused.length>8) //use this if you want it vertically aligned if there is less than 8 bells
+  horzon = notesused.length < 7; //use this if you want it vertically aligned if there is less than 7 bells
   staves = [];
   let len = notesused.length;
   for(let i = 0; i < len; i++){
