@@ -687,10 +687,10 @@ function genPublicThumbs(){
       try{openSongEditMenu(entry);}catch(err){}
       document.getElementById("entries").appendChild(entry);
     }
-    //hide all public songs initialy
+    //hide all private songs initialy
     // let usr = firebase.auth().currentUser;
     // if(usr){
-      let c = document.getElementsByClassName('cloud');
+      let c = document.getElementsByClassName('personal');
       for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
     // }
   }).catch(function(error) {
