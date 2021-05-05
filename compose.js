@@ -653,9 +653,9 @@ function deletesong(){
   let usr = firebase.auth().currentUser;
   let songname = document.getElementById('songtitleinlib').innerHTML;
   if(document.getElementById('deletesong').innerHTML == "Click again to confirm"){
-    console.log('deleting song...');
     if(ispublic) makePrivate(true);
     else{
+      console.log(songname+':'+usr.displayName+':'+usr.uid);
       db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).delete().then(function() {
       console.log("Song doc successfully deleted!");
       //delete personal song index .replace('song name','');
@@ -683,7 +683,7 @@ function deletesong(){
     });
   }
   }
-  document.getElementById('deletesong').innerHTML = "Are you sure?";
+  document.getElementById('deletesong').innerHTML = "Click again to confirm";
 }
 function makePrivate(deleteAfter){
   let btn = document.getElementById('gopublic');
