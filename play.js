@@ -697,3 +697,57 @@ function genPublicThumbs(){
       console.log("couldn't get songlist: " + error);
   });
 }
+
+//search functions
+var searchElement = document.getElementById('searchLib');
+var searchType = document.getElementById('selectorLib');
+
+searchElement.addEventListener('change',e =>{
+  search(searchType.value,e.target.value);
+});
+searchElement.addEventListener('input',e =>{
+  search(searchType.value,e.target.value);
+});
+searchType.addEventListener('change',e =>{
+  searchElement.value = '';
+  search(0,'');
+});
+
+function search(type,value){
+  // console.log(type,value);
+  let numericValue = parseInt(value);
+  let eles = document.getElementsByClassName('entry');
+  for(let i = 0; i < eles.length; i++){
+    let string = eles[i].querySelector('.innertext');
+    if(string){
+      if(type == 0){
+        if(string.innerText.toLowerCase().includes(value.toLowerCase())){
+          eles[i].style.display = 'block';
+        }else{
+          eles[i].style.display = 'none'
+        }
+      }
+      else if(type == 1){
+        if(parseInt(string.innerText.split('(')[1]) < numericValue){
+          eles[i].style.display = 'block';
+        }else{
+          eles[i].style.display = 'none'
+        }
+      }
+      else if(type == 2){
+        if(parseInt(string.innerText.split('(')[1]) >= numericValue){
+          eles[i].style.display = 'block';
+        }else{
+          eles[i].style.display = 'none'
+        }
+      }
+      else if(type == 3 && string.innerText.split(', by')[1]){
+        if(string.innerText.split(', by')[1].toLowerCase().includes(value.toLowerCase())){
+          eles[i].style.display = 'block';
+        }else{
+          eles[i].style.display = 'none'
+        }
+      }
+    }
+  }
+}

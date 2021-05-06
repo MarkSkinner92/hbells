@@ -8,7 +8,6 @@
    <link rel="icon" href="favicon.png" type="image/gif">
    <title>Handybells Play</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="play.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.0.0"></script>
 
     <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
@@ -102,7 +101,7 @@
             cursor:pointer;
         }
         .public{
-          background-color: #cd8532;
+          background-color: #5edbf7;
         }
         .innertext{
             display: inline-block;
@@ -237,7 +236,7 @@
     <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
   </div>
   <div id="Logindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%; padding-bottom: 20px; background-color:#185162">
-    <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px">Login to Handybells</h1>
+    <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px">Log in to Handybells</h1>
     <div class="container center">
       <label for="uname"><b class = "center">Email</b></label>
       <input id='emaillogin' class = "fullinput" type="text" placeholder="Enter Email" name="uname" required>
@@ -245,7 +244,9 @@
       <label for="pswlogin"><b class = "center">Password</b></label>
       <input id='pswlogin' class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
 
-      <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton">Login</button><button onclick="hideLogin()" class="formbutton">Cancel</button>
+      <button onclick="forgotPassword()" class="formbutton btn">Forgot Password</button>
+      <button onclick="hideLogin()" class="formbutton btn">Cancel</button>
+      <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton btn">Login</button>
     </div>
   </div>
   <div id="Signindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%;padding-bottom: 0px;background-color:#185162">
@@ -269,14 +270,13 @@
   </div>
   <div id = 'library' class='library'>
         <h1 class = "headertextlib">Cloud Song Library</h1>
-        <select class = "selectlib">
-            <option>Search By Title</option>
-            <option>Search Max Bell Count</option>
-            <option>Search Min Bell Count</option>
-            <option>Search By Creator</option>
+        <select class = "selectlib" id='selectorLib'>
+            <option value='0'>Search By Title</option>
+            <option value='1'>Search Max Bell Count</option>
+            <option value='2'>Search Min Bell Count</option>
+            <option value='3'>Search By Creator</option>
         </select>
-        <input class="inputlib" type="text" placeholder="Search.." name="search">
-        <button class="buttonSearchLib">Search</button>
+        <input id='searchLib'class="inputlib" type="text" placeholder="Search.." name="search">
         <div id="entries" class="entries">
           <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">The Wheels On The Bus (7 bells)</h1><h1 class="innertext"></h1></div>
           <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">I'm A Little Tea Pot (7 bells)</h1><h1 class="innertext"></h1></div>
@@ -287,5 +287,6 @@
         <button id='libmode' onclick="changeLibrary()" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px; display: none">Show Private Library</button>
       <h2 id='message' style="position: absolute; bottom: -4px; left: 10px; font-size: 20px">Log in to see your songs, and the whole public library</h2>
     </div>
+    <script language="javascript" type="text/javascript" src="play.js"></script>
 </body>
 </html>

@@ -639,7 +639,7 @@ function newsong(){
   let a = document.getElementById('bpb').value || 4;
   let b = document.getElementById('pb').value || 0;
   let c = document.getElementById('newsongname').value;
-  if(c.length > 0){
+  if(cleanSongName(c).length >= 4){
     timesig.top = constrain(parseInt(a),2,6);
     timesig.pickup = parseInt(b);
     if(timesig.pickup == 0) timesig.pickup = timesig.top;
@@ -805,7 +805,7 @@ function noUserSignedIn(){
   console.log("not logged in yet");
   document.getElementById('Login').src = 'res/login.png';
 }
-//prompt user before leaving
+//prompt user before leaving (not for electron)
 window.onbeforeunload = function() {
     return true;
 };

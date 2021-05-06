@@ -30,11 +30,11 @@ var firebaseConfig = {
       verif = false;
       msg="Passwords don't match";
     }
-    if(password.length < 5){
+    if(password.length < 6){
       verif = false;
       msg="Password too short";
     }
-    if(password.length > 30){
+    if(password.length > 35){
       verif = false;
       msg="Password too long";
     }
@@ -82,6 +82,9 @@ function LogInAccount(){
     var errorCode = error.code;
     var errorMessage = error.message;
     console.log(errorCode, errorMessage);
+    if(errorCode == 'auth/invalid-email') alert('Enter a valid email');
+    if(errorCode == 'auth/wrong-password') alert('Wrong password');
+    if(errorCode == 'auth/user-not-found') alert('User not found. Maybe sign up?');
     // ...
     });
   }
@@ -186,4 +189,17 @@ function deleteAcct(){
       document.getElementById('delpword').style.backgroundColor = "yellow";
     }
   });
+}
+
+function forgotPassword(){
+  let email = arguments[0] || document.getElementById('emaillogin').value;
+
+  if(!email) alert("Please enter your account's email");
+  else{
+    auth.sendPasswordResetEmail(email).then(function() {
+      alert('Sent a password reset email to ' + email);
+    }).catch(function(error) {
+      alert('Could not send an email to ' + email);
+    });
+  }
 }
