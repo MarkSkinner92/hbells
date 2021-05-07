@@ -199,7 +199,7 @@ function forgotPassword(){
 }
 
 const createStripeCheckout = firebase.functions().httpsCallable('createStripeCheckout');
-const stripe = Stripe('pk_live_51Inv5oIHwSlonKXUVboNbqRiCefYAbYTdecxM5CP2UeY8fwsgfBvBoJof4mvanBTWBOt3npIqIHYUsHqIs7lLU4E00Ag49s02I');
+const stripe = Stripe('pk_test_51Inv5oIHwSlonKXUAhSIFmNIjnVMOBQ9pr4ZiNU27f9hWXR2CnMPPEknYoOxHjhRG7MeJOfZKGiKRuTnqAeT2yym00YMFGAPRj');
 function buyMoreSongs(){
   let ogText = document.getElementById('buysongs').innerText;
   document.getElementById('buysongs').innerText = 'Creating stripe checkout...';
