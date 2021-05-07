@@ -10,6 +10,8 @@
   <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-functions.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
   <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-analytics.js"></script>
@@ -250,14 +252,23 @@
 <p id='welcome' style="position: absolute; z-index: 98; top: 0px; color: #FFF; right:105px; font-family: Arial">Not signed in</p>
 <p id='editingname' style="display: none; position: absolute; top: 0px; color: #FFF; left:646px; font-family: Arial">Editing: unnamed</p>
 <button id='acctmenubtn' onclick="showAcctMenu();hideNewSong();hideSaver();focused = false" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
-<div id = 'acctmenu' class='newsong' style="height:300px">
+<div id = 'acctmenu' class='newsong' style="height:400px">
   <h1 class = "headertextlib">Account Settings</h1>
+  <h3 style="display:none"id='songplayelement' class="headertextlib">You have 0 songplays left</h3>
   <div class="entries" style="width: calc(100% - 16px)">
-      <input id='delpword' placeholder="enter password" type="password" class="formbutton btn" style="margin:5px 5px 0px 5px; width:calc(100% - 10px)">
-      <button id='delbtn' onclick="deleteAcct()" class="formbutton btn" style="margin:5px 5px 0px 5px; background-color:#df3b27">Delete Account and Private Songs</button>
+    <button id='buysongs' onclick="buyMoreSongs()" class="formbutton btn" style="width:calc(100% - 10px);margin:5px 5px 0px 5px; background-color:#f1fe06">Buy 700 more song plays ($10.00 CAD)</button>
   </div>
   <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
-  <button onclick="hideAcctMenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
+  <button onclick="showDeleteMenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Advanced</button>
+</div>
+<div id = 'deleteAcctmenu' class='newsong' style="height:400px">
+  <h1 class = "headertextlib">Delete Account</h1>
+  <h3 class="headertextlib">This action cannot be undone</h3>
+  <div class="entries" style="width: calc(100% - 16px)">
+    <input id='delpword' placeholder="enter password" type="password" class="formbutton btn" style="margin:5px 5px 0px 5px; width:calc(100% - 10px)">
+    <button id='delbtn' onclick="deleteAcct()" class="formbutton btn" style="width:calc(100% - 10px); margin:5px 5px 0px 5px; background-color:#df3b27">Delete</button>
+  </div>
+  <button onclick="hideDeleteAcctmenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
 </div>
 <div id="Logindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 180px; left: 25%; width: 50%; padding-bottom: 20px; background-color:#185162">
   <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px">Log in to Handybells</h1>

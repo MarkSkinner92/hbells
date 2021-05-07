@@ -59,7 +59,7 @@ function setup() {
   upload.hide();
   download = createImg('composeRes/savefile.png');
   download.position(79,10);
-  download.mousePressed(showSaver);
+  download.mousePressed(BigD);
   play = createImg('composeRes/play.png');
   play.position(189,21);
   play.mousePressed(_play);
@@ -379,6 +379,11 @@ function _play(){
       play.attribute('src', 'composeRes/stop.png');
     }
   }
+  console.log('try');
+  hideLib();
+  hideAcctMenu();
+  hideSignin();
+  hideLogin();
 }
 function transposeUp(){
   transp(-1);
@@ -540,7 +545,7 @@ function setupNewSong(){
     if(usr){
       docRef.set({
         data: newusrdata,
-      }).then(function(){
+      },{merge:true}).then(function(){
         db.collection("Songs").doc(validsongname+':'+usr.displayName+':'+usr.uid).set({
           data: timesig.pickup+','+timesig.top+',100,,,,,'
         });

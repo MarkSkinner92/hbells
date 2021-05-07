@@ -368,7 +368,21 @@ function redocolor(n){
   }
 }
 function _play(){
+  hideAcctMenu();
+  hideLib();
   if(songinthehouse){
+    if(!playback){
+      //decrease the song count by 1
+      if(usr){
+        if(songplays > 0){
+          decreaseSongplays();
+        }
+        else{
+          showAcctMenu();
+          return;
+        }
+      }
+    }
     if(!paused){
       playback = true;
       playbackbar = barinput.value()-1;
@@ -386,7 +400,7 @@ function _stop(){
   playbackbar = 0;
   playbackcount = 0;
   playbackbeat = 0;
-  barinput.value(1);
+  if(barinput !== undefined) barinput.value(1);
   paused = false;
   play.attribute('src', 'playRes/play.png');
   barlinepos = [];
@@ -538,6 +552,7 @@ function hideLogin() {
 }
 function showLogin() {
   hideLib();
+  hideAcctMenu();
   focused = false;
   let imgsrc = document.getElementById('Login').src;
   if(imgsrc.substr(imgsrc.length-5) == 'n.png'){
@@ -570,6 +585,7 @@ function showLib(){
   _stop();
   hideSignin();
   hideLogin();
+  hideAcctMenu();
   let usr = firebase.auth().currentUser;
   let demos = document.getElementsByClassName('demo');
 
@@ -751,3 +767,8 @@ function search(type,value){
     }
   }
 }
+
+window.addEventListener("beforeunload", function(event) {
+  //save songplays to firebase
+  setSongplays(42);
+});
