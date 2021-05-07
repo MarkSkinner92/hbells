@@ -199,8 +199,9 @@ function forgotPassword(){
 }
 
 const createStripeCheckout = firebase.functions().httpsCallable('createStripeCheckout');
-const stripe = Stripe('pk_test_51Inv5oIHwSlonKXUAhSIFmNIjnVMOBQ9pr4ZiNU27f9hWXR2CnMPPEknYoOxHjhRG7MeJOfZKGiKRuTnqAeT2yym00YMFGAPRj');
+const stripe = Stripe('pk_live_51Inv5oIHwSlonKXUVboNbqRiCefYAbYTdecxM5CP2UeY8fwsgfBvBoJof4mvanBTWBOt3npIqIHYUsHqIs7lLU4E00Ag49s02I');
 function buyMoreSongs(){
+  dontPromptUserBeforeLeaving();
   let ogText = document.getElementById('buysongs').innerText;
   document.getElementById('buysongs').innerText = 'Creating stripe checkout...';
   document.getElementById('buysongs').onclick = null;
@@ -210,12 +211,23 @@ function buyMoreSongs(){
     //add sessionID to firestore, with uuid
     console.log(sessionId,usr.uid);
     document.getElementById('buysongs').innerText = 'Redirecting to stripe checkout...';
-    db.collection("Sessions").doc(sessionId).set({uid: usr.uid}).then((e) => {
-      document.getElementById('buysongs').innerText = ogText;
+    let sescol = db.collection("Sessions");
+    sescol.where("time", "<", Date.now()-86400000).get().then((snapshot)=>{
+      for(let i = 0; i < snapshot.docs.length; i++){
+        snapshot.docs[i].ref.delete();
+      }
+    });
+    sescol.doc(sessionId).set({uid: usr.uid, time:Date.now()}).then((e) => {
       stripe.redirectToCheckout( {
         sessionId: sessionId
-      } );
-      console.log('success');
+      } ).then(function(result) {
+        if (result.error) {
+          alert(result.error.message);
+        }else{
+          console.log('success');
+          document.getElementById('buysongs').innerText = ogText;
+        }
+      });
     }).catch(err => {
       console.log('db error',err);
     });

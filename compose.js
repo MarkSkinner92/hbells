@@ -269,6 +269,16 @@ function keyPressed(){
   if(key == ' ' && focused){
     _play();
   }
+  if(keyCode == ENTER){
+    let log = document.getElementById('loginenter');
+    let sig = document.getElementById('signinenter');
+    if(document.getElementById('Logindiv').style.display != 'none'){
+      log.click();
+    }
+    if(document.getElementById('Signindiv').style.display != 'none'){
+      sig.click();
+    }
+  }
 }
 function mouseInRect(a,b,c,d){
   if(mouseX < a+c && mouseX > a && mouseY > b && mouseY < b+d) return true;
@@ -468,6 +478,13 @@ function showLogin() {
     firebase.auth().signOut().then(function() {
       // Sign-out successful.
       document.getElementById('Login').src = 'res/login.png';
+      //delete clear all notes
+      deleteAllNotes();
+      ineditmode = false;
+      document.getElementById('editingname').style.display = 'none';
+      document.getElementById('btn').style.display = 'none';
+      document.getElementById('openlib').innerHTML = 'Open Library';
+
     }).catch(function(error) {
       // An error happened.
       console.log('could not sign out: '+error);
@@ -810,7 +827,13 @@ function noUserSignedIn(){
   console.log("not logged in yet");
   document.getElementById('Login').src = 'res/login.png';
 }
-//prompt user before leaving (not for electron)
-window.onbeforeunload = function() {
-    return true;
-};
+
+function promptUserBeforeLeaving(){
+  window.onbeforeunload = function() {
+      return true;
+  };
+}
+function dontPromptUserBeforeLeaving(){
+  window.onbeforeunload = null;
+}
+promptUserBeforeLeaving();

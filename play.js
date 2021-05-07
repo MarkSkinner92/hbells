@@ -767,8 +767,11 @@ function search(type,value){
     }
   }
 }
-
-window.addEventListener("beforeunload", function(event) {
-  //save songplays to firebase
-  setSongplays(42);
-});
+function promptUserBeforeLeaving(){
+  window.onbeforeunload = function() {
+      return true;
+  };
+}
+function dontPromptUserBeforeLeaving(){
+  window.onbeforeunload = null;
+}
