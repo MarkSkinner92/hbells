@@ -586,16 +586,6 @@ function hideNewSong(){
   focused = true;
   document.getElementById('newsong').style.display = 'none';
 }
-function showSaver(){
-  hideLib();
-  hideAcctMenu();
-  focused = false;
-  document.getElementById('saver').style.display = 'inline';
-}
-function hideSaver(){
-  focused = true;
-  document.getElementById('saver').style.display = 'none';
-}
 function cleanSongName(name){
   return name.replace(/[^a-zA-Z0-9\s_]/g, '');
 }

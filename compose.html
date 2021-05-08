@@ -225,7 +225,7 @@
 <img onclick="hideLogin(); showSignin()" src = 'res/signup.png' id="Signup" style="position: absolute; z-index: 98; top: 40px; color: black; right:8px;">
 <p id='welcome' style="position: absolute; z-index: 98; top: 0px; color: #FFF; right:105px; font-family: Arial">Not signed in</p>
 <p id="editingname" style="display: inline;position: absolute;top: -3px;color: rgb(255, 255, 255);left: 710px;font-family: Arial;"></p>
-<button id='acctmenubtn' onclick="showAcctMenu();hideNewSong();hideSaver();focused = false" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
+<button id='acctmenubtn' onclick="showAcctMenu();hideNewSong();focused = false" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
 <div id = 'acctmenu' class='newsong' style="height:400px">
   <h1 class = "headertextlib">Account Settings</h1>
   <h3 style="display:none"id='songplayelement' class="headertextlib">You have 0 songplays left</h3>
@@ -235,7 +235,7 @@
   <button onclick="hideAcctMenu();hideAccDone();" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
   <button onclick="showDeleteMenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Advanced</button>
 </div>
-<div id = 'deleteAcctmenu' class='newsong' style="height:400px">
+<div id = 'deleteAcctmenu' class='newsong' style="height:400px; display:none">
   <h1 class = "headertextlib">Delete Account</h1>
   <h3 class="headertextlib">This action cannot be undone</h3>
   <div class="entries" style="width: calc(100% - 16px)">
@@ -302,14 +302,6 @@
        <button id='newSongClick'onclick="newsong()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
        <button id='newSongCancel'onclick="showLib()" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
    </div>
-<div id = 'saver' class='newsong' style="height:300px">
-  <h1 class = "headertextlib">Save Current Song</h1>
-  <div class="entries" style="width: calc(100% - 16px)">
-      <button onclick="BigD()" class="formbutton btn btn" style="margin:5px 5px 0px 5px">Save as file</button>
-  </div>
-  <button onclick="hideSaver();" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
-  <button onclick="hideSaver();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
-</div>
 <button id='openlib' class="btn" onclick="uploadOnline()" style="position:absolute; display: none;top: 40px; left: 646px; background-color: #27dfde; color:#000; border:none; border-radius:5px; width:153px;height:27px;">Open My Library</button>
 <button id="cancelEditmode" class="btn" onclick="cancelEditmode()" style="display:none;position: absolute;top: 8px;left: 646px;background-color: rgb(87 224 222);color: rgb(0, 0, 0);border: none;border-radius: 5px;width: 55px;height: 27px;">Cancel</button>
 <button id='btn' class="btn" onclick="deleteAllNotes()" style="display: none; position:absolute; top: 40px; left: 805px; background-color: #df3b27; color:#FFF; border:none; border-radius:5px; width:140px;height:27px;">Delete All Notes</button>
