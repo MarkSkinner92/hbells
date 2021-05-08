@@ -606,9 +606,11 @@ function showLib(){
   let demos = document.getElementsByClassName('demo');
 
   if(usr){
+    document.getElementById('privateMessage').style.display = 'inline';
     document.getElementById('message').style.display = 'none';
   }else{
     document.getElementById('message').style.display = 'inline';
+    document.getElementById('privateMessage').style.display = 'none';
   }
   document.getElementById("library").style.display = "inline";
   focused = false;
