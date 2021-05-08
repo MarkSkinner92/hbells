@@ -21,7 +21,10 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   attatchDemoClickListeners();
   textStyle(BOLD);
-  for(let i = 0; i < 25; i++) notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
+  for(let i = 0; i < 25; i++){
+    // notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
+    createjs.Sound.registerSound('sounds/'+onv[i]+'.wav', i);
+  }
   songinput = createFileInput(getFile);
   songinput.position(6,6);
   songinput.size(96,30);
@@ -323,18 +326,19 @@ class Staff {
     if(this.notes[length-1] >= hitx){
       if(playsound){
         if(isNaN(transposeinput.value())){
-          notesounds[n].currentTime = 0;
-          notesounds[n].play();
+          playAudioNote(n);
         }
         else {
-          notesounds[n-Number(transposeinput.value())].currentTime = 0;
-          notesounds[n-Number(transposeinput.value())].play();
+          playAudioNote(n-Number(transposeinput.value()));
         }
       }
       playbackcount++;
       this.notes.pop();
     }
   }
+}
+function playAudioNote(n){
+  createjs.Sound.play(n);
 }
 function colorchange(){
   for(let i = 0; i < staves.length; i++){

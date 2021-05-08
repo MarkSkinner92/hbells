@@ -1,7 +1,7 @@
 var usrname = '';
 var privateNames = '';
 var publicNames = '';
-var songplays = 0, startlimit = 20;
+var songplays = 0, startlimit = 10;
 var usr;
 var firebaseConfig = {
     apiKey: "AIzaSyDYfqrtoGoZqFusXkQaEH-9fiPozlzWq2I",

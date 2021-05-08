@@ -27,7 +27,10 @@ function preload(){
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  for(let i = 0; i < 25; i++) notesounds[i] = new Audio('sounds/'+nv[i]+'.wav');
+  for(let i = 0; i < 25; i++){
+    // notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
+    createjs.Sound.registerSound('sounds/'+nv[i]+'.wav', i);
+  }
   nameinput = createInput();
   nameinput.position(313,354);
   nameinput.size(216,31);
@@ -260,10 +263,7 @@ function mousePressed(){
       }
       if(ok && focused){
           notedata.push({p:mousenote,bar:mousebar,beat:mousebeat});
-          if(notesounds[mousenote]){
-            notesounds[mousenote].currentTime = 0;
-            notesounds[mousenote].play();
-          }
+          playAudioNote(mousenote);
           notesplayed = 0;
         }
     }
@@ -306,10 +306,7 @@ function playNotesAt(bar, beat){
     let foo = notedata[i];
     if(foo.bar == bar && foo.beat == beat){
 
-      if(notesounds[foo.p]){
-        notesounds[foo.p].currentTime = 0;
-        notesounds[foo.p].play();
-      }
+      playAudioNote(foo.p);
       if(playback)notesplayed++;
     }
   }
@@ -558,6 +555,7 @@ function showLib(){
   focused = false;
   document.getElementById('lib').style.display = 'inline';
   document.getElementById('openlib').style.display = 'none';
+  document.getElementById('newsongname').style.border = 'none';
 }
 function hideLib(){
   document.getElementById('lib').style.display = 'none';
@@ -646,7 +644,9 @@ function createSongTileFromTimesig(){
       console.log("Error getting user specific document:", error);
   });
 }
-
+function playAudioNote(n){
+  createjs.Sound.play(n);
+}
 function showCancel(){
   document.getElementById('cancelEditmode').style.display = 'inline';
 }
@@ -770,6 +770,8 @@ function newsong(){
     setupNewSong();
     // editsong();
     hideNewSong();
+  }else{
+    document.getElementById('newsongname').style.border = 'solid red';
   }
 }
 function deletesong(){
