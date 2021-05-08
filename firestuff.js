@@ -1,7 +1,7 @@
 var usrname = '';
 var privateNames = '';
 var publicNames = '';
-var songplays = 10;
+var songplays = 0, startlimit = 20;
 var usr;
 var firebaseConfig = {
     apiKey: "AIzaSyDYfqrtoGoZqFusXkQaEH-9fiPozlzWq2I",
@@ -119,7 +119,7 @@ auth.onAuthStateChanged(function(user) {
     }).catch(function(error) {
         console.log("couldn't get doc" + error);
         console.log("creating songlist document: Users/"+usr.uid);
-        db.collection("Users").doc(usr.uid).set({songplays: 10, data:''}).then(function(re){
+        db.collection("Users").doc(usr.uid).set({songplays: startlimit, data:''}).then(function(re){
           console.log('DOCUMENT WAS CREATED',re);
           try{genPublicThumbs();}catch(err){}
         }).catch(function(e){
@@ -133,7 +133,6 @@ auth.onAuthStateChanged(function(user) {
     if(document.getElementById('songplayelement')){
       document.getElementById('songplayelement').style.display = 'none';
     }
-    focused = true;
   }
 });
 function showAcctMenu(){
@@ -141,10 +140,6 @@ function showAcctMenu(){
   hideSignin();
   focused = false;
   document.getElementById('acctmenu').style.display = "inline";
-}
-function hideAcctMenu(){
-  document.getElementById('acctmenu').style.display = "none";
-  focused = true;
 }
 function hasClass(element, className) {
     return (' ' + element.className + ' ').indexOf(' ' + className+ ' ') > -1;
@@ -239,7 +234,7 @@ function createFirebaseAccount({email,password,displayName}){
   console.log('created account');
     console.log("creating songlist document: Users/"+result.user.uid);
     usr = result.user;
-    db.collection("Users").doc(result.user.uid).set({songplays: 50, data:''}).then(function(re){
+    db.collection("Users").doc(result.user.uid).set({songplays: startlimit, data:''}).then(function(re){
       console.log('DOCUMENT WAS CREATED',re);
     }).catch(function(e){
       console.log("couldn't make user document: "+e);

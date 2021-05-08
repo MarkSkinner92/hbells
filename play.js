@@ -90,6 +90,7 @@ function setup() {
 
   currentsongdata = loadStrings('playRes/lib/songs/London Bridge (6 bells).txt', callbackloadfile);
   styleSettings();
+  showLib();
 }
 function attatchDemoClickListeners(){
   let demos = document.getElementsByClassName('demo');
@@ -321,8 +322,14 @@ class Staff {
     }
     if(this.notes[length-1] >= hitx){
       if(playsound){
-        if(isNaN(transposeinput.value())) notesounds[n].cloneNode(true).play();
-        else notesounds[n-Number(transposeinput.value())].cloneNode(true).play();
+        if(isNaN(transposeinput.value())){
+          notesounds[n].currentTime = 0;
+          notesounds[n].play();
+        }
+        else {
+          notesounds[n-Number(transposeinput.value())].currentTime = 0;
+          notesounds[n-Number(transposeinput.value())].play();
+        }
       }
       playbackcount++;
       this.notes.pop();
@@ -393,17 +400,19 @@ function _play(){
   }
 }
 function _stop(){
-  for(let i = 0; i < staves.length; i++){
-    staves[i].notes = [];
+  if(playback){
+    for(let i = 0; i < staves.length; i++){
+      staves[i].notes = [];
+    }
+    playback = false;
+    playbackbar = 0;
+    playbackcount = 0;
+    playbackbeat = 0;
+    if(barinput !== undefined) barinput.value(1);
+    paused = false;
+    play.attribute('src', 'playRes/play.png');
+    barlinepos = [];
   }
-  playback = false;
-  playbackbar = 0;
-  playbackcount = 0;
-  playbackbeat = 0;
-  if(barinput !== undefined) barinput.value(1);
-  paused = false;
-  play.attribute('src', 'playRes/play.png');
-  barlinepos = [];
 }
 function mouseInRect(a,b,c,d){
   if(mouseX < a+c && mouseX > a && mouseY > b && mouseY < b+d) return true;
@@ -559,20 +568,27 @@ function showLogin() {
     document.getElementById("Logindiv").style.display = "inline";
   }else{
     console.log('signing out...');
-    firebase.auth().signOut().then(function() {
-      // Sign-out successful.
-      document.getElementById('Login').src = 'res/login.png';
-    }).catch(function(error) {
-      // An error happened.
-      console.log('could not sign out: '+error);
-    });
+    signOutActions();
   }
 }
 function hideSignin() {
   document.getElementById("Signindiv").style.display = "none";
   focused = true;
 }
+function signOutActions(){
+  firebase.auth().signOut().then(function() {
+    // Sign-out successful.
+    document.getElementById('Login').src = 'res/login.png';
+  }).catch(function(error) {
+    // An error happened.
+    console.log('could not sign out: '+error);
+  });
+}
 function showSignin() {
+  if(usr){
+    signOutActions();
+    return;
+  }
   document.getElementById("Signindiv").style.display = "inline";
   hideLib();
   focused = false;
@@ -590,10 +606,8 @@ function showLib(){
   let demos = document.getElementsByClassName('demo');
 
   if(usr){
-    document.getElementById('libmode').style.display = 'inline';
     document.getElementById('message').style.display = 'none';
   }else{
-    document.getElementById('libmode').style.display = 'none';
     document.getElementById('message').style.display = 'inline';
   }
   document.getElementById("library").style.display = "inline";
@@ -656,23 +670,6 @@ function openSongFromDiv(targetdom){
     });
   }
 }
-function changeLibrary(){
-  if(document.getElementById('libmode').innerHTML == 'Show Private Library'){
-    //hide all public songs
-    let c = document.getElementsByClassName('cloud');
-    for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
-    //show all private songs
-    c = document.getElementsByClassName('personal');
-    for(let i = 0; i < c.length; i++) c[i].style.display = 'block';
-    document.getElementById('libmode').innerHTML = 'Show Public Library';
-  }else{
-    document.getElementById('libmode').innerHTML = 'Show Private Library';
-    let c = document.getElementsByClassName('cloud');
-    for(let i = 0; i < c.length; i++) c[i].style.display = 'block';
-    c = document.getElementsByClassName('personal');
-    for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
-  }
-}
 function genPublicThumbs(){
   var docRef = db.collection("Songlists").doc('list1');
   console.log('getting songlist 1... ' + docRef);
@@ -703,12 +700,6 @@ function genPublicThumbs(){
       try{openSongEditMenu(entry);}catch(err){}
       document.getElementById("entries").appendChild(entry);
     }
-    //hide all private songs initialy
-    // let usr = firebase.auth().currentUser;
-    // if(usr){
-      let c = document.getElementsByClassName('personal');
-      for(let i = 0; i < c.length; i++) c[i].style.display = 'none';
-    // }
   }).catch(function(error) {
       console.log("couldn't get songlist: " + error);
   });
@@ -766,6 +757,10 @@ function search(type,value){
       }
     }
   }
+}
+function hideAcctMenu(){
+  document.getElementById('acctmenu').style.display = "none";
+  focused = true;
 }
 function promptUserBeforeLeaving(){
   window.onbeforeunload = function() {

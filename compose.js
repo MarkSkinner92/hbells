@@ -15,7 +15,7 @@ var playbackbar = 0, playbackbeat = 0, playbacktime = 0, playbacktempotime = 500
 let nameinput, bars, pickups, smok, smcancel;
 let cancelmenu = false;
 let notesplayed = 0;
-let focused = true;
+let focused = false;
 let ineditmode = false;
 let ispublic = false;
 let prevbells = 0;
@@ -100,6 +100,8 @@ function setup() {
   home = createImg('composeRes/home.png');
   home.position(12,14);
   home.parent('homeparent');
+  //if not signed in, show new song
+  if(document.getElementById('lib').style.display == 'none') showNewSong(false,true);
 }
 
 function draw() {
@@ -258,7 +260,10 @@ function mousePressed(){
       }
       if(ok && focused){
           notedata.push({p:mousenote,bar:mousebar,beat:mousebeat});
-          if(notesounds[mousenote]) notesounds[mousenote].cloneNode(true).play();
+          if(notesounds[mousenote]){
+            notesounds[mousenote].currentTime = 0;
+            notesounds[mousenote].play();
+          }
           notesplayed = 0;
         }
     }
@@ -277,6 +282,9 @@ function keyPressed(){
     }
     if(document.getElementById('Signindiv').style.display != 'none'){
       sig.click();
+    }
+    if(document.getElementById('newsong').style.display != 'none'){
+      document.getElementById('newSongClick').click();
     }
   }
 }
@@ -297,15 +305,21 @@ function playNotesAt(bar, beat){
   for(let i = 0; i < notedata.length; i++){
     let foo = notedata[i];
     if(foo.bar == bar && foo.beat == beat){
-      if(notesounds[foo.p]) notesounds[foo.p].cloneNode(true).play();
+
+      if(notesounds[foo.p]){
+        notesounds[foo.p].currentTime = 0;
+        notesounds[foo.p].play();
+      }
       if(playback)notesplayed++;
     }
   }
 }
 function BigD(){
-  let dt = getExportArray();
-  console.log(dt.join(','));
-  save(dt,timesig.name.replace(/ /g, "_")+'.txt');
+  if(focused){
+    let dt = getExportArray();
+    console.log(dt.join(','));
+    save(dt,timesig.name.replace(/ /g, "_")+'.txt');
+  }
 }
 function getSongString(){
   return getExportArray().join(',');
@@ -337,24 +351,40 @@ function getExportArray(){
   return xport;
 }
 function BigU(file) {
+  console.log('yeey');
   let arr = file.data.split('\n');
-  timesig.pickup = Number(arr[0]);
-  timesig.top = Number(arr[1]);
-  timesig.tempo = Number(arr[2]);
-  timesig.name = file.name.substring(0, file.name.length-4).replace(/_/g, " ");
-  notedata = [(arr.length-9)/3];
-  let index = 8;
-  for(let i = 0; i < (arr.length-9)/3; i++){
-    notedata[i] = {p:Number(arr[index]),bar:Number(arr[index+1]),beat:Number(arr[index+2])};
-    index+=3;
+  if(Number(arr[1]) > 0 && Number(arr[1]) < 15){ //detect if the song is real
+    timesig.pickup = Number(arr[0]);
+    timesig.top = Number(arr[1]);
+    timesig.tempo = Number(arr[2]);
+    timesig.name = file.name.substring(0, file.name.length-4).replace(/_/g, " ");
+    notedata = [(arr.length-9)/3];
+    let index = 8;
+    for(let i = 0; i < (arr.length-9)/3; i++){
+      notedata[i] = {p:Number(arr[index]),bar:Number(arr[index+1]),beat:Number(arr[index+2])};
+      index+=3;
+    }
+    document.getElementById('editingname').innerHTML = 'Editing: '+timesig.name;
+    ineditmode = true;
+    showCancel();
+    if(usr){
+      document.getElementById('openlib').innerHTML = 'Save and Return';
+      document.getElementById('openlib').style.display = 'inline';
+    }
+    document.getElementById('editingname').style.display = 'inline';
+    document.getElementById('btn').style.display = 'inline';
+    hideNewSong();
+    hideLib();
+    hideAcctMenu();
+    upload.elt.value=null;
   }
+  document.getElementById('')
 }
 function setSongString(file){
   let arr = file.split(',');
   timesig.pickup = Number(arr[0]);
   timesig.top = Number(arr[1]);
   timesig.tempo = Number(arr[2]);
-  timesig.name = 'unnamed';
   notedata = [(arr.length-9)/3];
   let index = 8;
   for(let i = 0; i < (arr.length-9)/3; i++){
@@ -363,37 +393,35 @@ function setSongString(file){
   }
 }
 function shiftleft(){
-  if(cm > 1 && mode == 0){
+  if(cm > 1 && mode == 0 && focused){
     cm--;
   }
 }
 function shiftright(){
-  if(mode == 0){
+  if(mode == 0 && focused){
     cm++;
   }
 }
 function _play(){
-  if(mode == 0){
-    if(playback){
-      playback = false;
-      playbackbar = cm-1;
-      backbar.value(cm);
-      playbackbeat = 0;
-      playbacktime = 0;
-      play.attribute('src', 'composeRes/play.png');
+  if(focused){
+    if(mode == 0){
+      if(playback){
+        playback = false;
+        playbackbar = cm-1;
+        backbar.value(cm);
+        playbackbeat = 0;
+        playbacktime = 0;
+        play.attribute('src', 'composeRes/play.png');
+      }
+      else{
+        playback = true;
+        playbackbar = backbar.value()-1;
+        playbackbeat = 0;
+        play.attribute('src', 'composeRes/stop.png');
+      }
     }
-    else{
-      playback = true;
-      playbackbar = backbar.value()-1;
-      playbackbeat = 0;
-      play.attribute('src', 'composeRes/stop.png');
-    }
+    console.log('try');
   }
-  console.log('try');
-  hideLib();
-  hideAcctMenu();
-  hideSignin();
-  hideLogin();
 }
 function transposeUp(){
   transp(-1);
@@ -402,7 +430,7 @@ function transposeDown(){
   transp(1);
 }
 function transp(d){
-  if(mode == 0){
+  if(mode == 0 && focused){
     for(let i = 0; i < notedata.length; i++){
       if(Number(notedata[i].p)+Number(d) < 0 || Number(notedata[i].p)+Number(d) > 24){
         return;
@@ -466,42 +494,65 @@ function deleteAllNotes(){
 function hideLogin() {
   document.getElementById("Logindiv").style.display = "none";
   focused = true;
+  if(!ineditmode) showNewSong();
 }
 function showLogin() {
   hideLib();
+  hideNewSong();
   focused = false;
   let imgsrc = document.getElementById('Login').src;
   if(imgsrc.substr(imgsrc.length-5) == 'n.png'){
     document.getElementById("Logindiv").style.display = "inline";
   }else{
     console.log('signing out...');
-    firebase.auth().signOut().then(function() {
-      // Sign-out successful.
-      document.getElementById('Login').src = 'res/login.png';
-      //delete clear all notes
-      deleteAllNotes();
-      ineditmode = false;
-      document.getElementById('editingname').style.display = 'none';
-      document.getElementById('btn').style.display = 'none';
-      document.getElementById('openlib').innerHTML = 'Open Library';
-
-    }).catch(function(error) {
-      // An error happened.
-      console.log('could not sign out: '+error);
-    });
+    signOutActions();
   }
+}
+function signOutActions(){
+  firebase.auth().signOut().then(function() {
+    // Sign-out successful.
+    document.getElementById('Login').src = 'res/login.png';
+    //delete clear all notes
+    deleteAllNotes();
+    ineditmode = false;
+    hideCancel();
+    document.getElementById('editingname').style.display = 'none';
+    document.getElementById('btn').style.display = 'none';
+    document.getElementById('openlib').innerHTML = 'Open Library';
+  }).catch(function(error) {
+    console.log('could not sign out: '+error);
+  });
 }
 function hideSignin() {
   document.getElementById("Signindiv").style.display = "none";
   focused = true;
+  if(!ineditmode) showNewSong();
 }
 function showSignin() {
+  if(usr){
+    signOutActions();
+    return;
+  }
   document.getElementById("Signindiv").style.display = "inline";
   hideLib();
   hideAcctMenu();
+  hideNewSong();
   focused = false;
 }
+function hideAcctMenu(){
+  document.getElementById('acctmenu').style.display = "none";
+}
+function hideAccDone(){
+  if(ineditmode){
+    focused = true;
+  }else{
+    showLib();
+  }
+}
 function showLib(){
+  if(ineditmode){
+    if(getSongString().length >= 20) uploadOnline();
+  }
   hideNewSong();
   hideAcctMenu();
   focused = false;
@@ -510,13 +561,25 @@ function showLib(){
 }
 function hideLib(){
   document.getElementById('lib').style.display = 'none';
-  document.getElementById('openlib').style.display = 'inline';
-  focused = true;
+  // document.getElementById('openlib').style.display = 'inline';
 }
-function showNewSong(){
-  hideLib();
+function closeLib(){
+  if(!ineditmode){
+    showNewSong(true);
+  }else{
+    document.getElementById('openlib').innerHTML = 'Save and Return';
+    document.getElementById('openlib').style.display = 'inline';
+  }
+}
+function showNewSong(cancellable,donthidelib){
+  if(!donthidelib) hideLib();
   hideAcctMenu();
   focused = false;
+  if(cancellable){
+    document.getElementById('newSongCancel').style.display = 'unset';
+  }else{
+    document.getElementById('newSongCancel').style.display = 'none';
+  }
   document.getElementById('newsong').style.display = 'inline';
 }
 function hideNewSong(){
@@ -536,21 +599,46 @@ function hideSaver(){
 function cleanSongName(name){
   return name.replace(/[^a-zA-Z0-9\s_]/g, '');
 }
+
+
 function setupNewSong(){
+  let validsongname = cleanSongName(document.getElementById('newsongname').value);
+  document.getElementById('editingname').innerHTML = 'Editing: '+validsongname.split(':')[0];
+  timesig.name = validsongname;
+  ineditmode = true;
+  showCancel();
+  focused = true;
+  ispublic = false;
+  prevbells = 0;
+  if(usr){
+    document.getElementById('openlib').innerHTML = 'Save and Return';
+    document.getElementById('openlib').style.display = 'inline';
+  }
+  document.getElementById('editingname').style.display = 'inline';
+  document.getElementById('btn').style.display = 'inline';
+}
+
+//createSongTileFromTimesig();
+function createSongTileFromTimesig(){
+  console.log('makin a new one');
   let validsongname="";
+
   var name = document.createElement("H1");
-  validsongname = cleanSongName(document.getElementById('newsongname').value);
+  validsongname = cleanSongName(timesig.name);
   name.innerHTML = validsongname;
   name.className = "innertext";
+
   var info = document.createElement("H1");
   info.innerHTML = "";
   info.className = "innertext";
+
   var entry = document.createElement("DIV");
   entry.appendChild(name);
   entry.appendChild(info);
   entry.className = "entry";
   entry.id='songthumb';
   entry.addEventListener("click", clickedOnSong);
+
   openSongEditMenu(entry);
   document.getElementById("entries").appendChild(entry);
   let usr = firebase.auth().currentUser;
@@ -562,20 +650,30 @@ function setupNewSong(){
     if(usr){
       docRef.set({
         data: newusrdata,
-      },{merge:true}).then(function(){
-        db.collection("Songs").doc(validsongname+':'+usr.displayName+':'+usr.uid).set({
-          data: timesig.pickup+','+timesig.top+',100,,,,,'
-        });
-        document.getElementById('openlib').innerHTML = 'Save and Return';
-        document.getElementById('songtitleinlib').innerHTML = validsongname.split(':')[0];
-        ineditmode = true;
-        document.getElementById('editingname').style.display = 'inline';
-        document.getElementById('btn').style.display = 'inline';
-      });
+      },{merge:true});
     }
   }).catch(function(error) {
       console.log("Error getting user specific document:", error);
   });
+}
+
+function showCancel(){
+  document.getElementById('cancelEditmode').style.display = 'inline';
+}
+function hideCancel(){
+document.getElementById('cancelEditmode').style.display = 'none';
+}
+function cancelEditmode(){
+  ineditmode = false;
+  document.getElementById('editingname').style.display = 'none';
+  document.getElementById('btn').style.display = 'none';
+  setSongString("4,4,100,0,,,,");
+  hideCancel();
+  if(usr){
+    showLib();
+  }else{
+    showNewSong();
+  }
 }
 function clickedOnSong(e){
   console.log('clicked on ' + e.target);
@@ -596,7 +694,10 @@ function openSongEditMenu(targetdom){
 }
 //save file to web button (save -> save to web menu)
 function uploadOnline(){
-  hideSaver();
+  console.log('upload online');
+  console.log('timesig',timesig);
+  console.log('public',ispublic);
+  console.log('prevbells',prevbells);
   let usr = firebase.auth().currentUser;
   //ineditmode -> are we currently editing a song from the library?
   if(ineditmode){
@@ -616,15 +717,22 @@ function uploadOnline(){
         });
       }
 
-      let songname = document.getElementById('songtitleinlib').innerHTML;
+      let songname = timesig.name;
       db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).set({
         data: songstring,
       }).then(function(){
         deleteAllNotes();
+        let sth = document.getElementsByClassName('entry');
+        let songExists = false;
+        for(let i = 0; i < sth.length; i++){
+          songExists = (songExists || sth[i].querySelector('.innertext').innerText == songname);
+        }
+        if(!songExists) createSongTileFromTimesig();
       });
     }
-    showLib();
     ineditmode = false;
+    hideCancel();
+    showLib();
     document.getElementById('editingname').style.display = 'none';
     document.getElementById('btn').style.display = 'none';
     document.getElementById('openlib').innerHTML = 'Open Library';
@@ -639,6 +747,8 @@ function uploadOnline(){
 }
 function editsong(){
   ineditmode=true;
+  showCancel();
+  focused = true;
   document.getElementById('editingname').style.display = 'inline';
   document.getElementById('btn').style.display = 'inline';
   usr = firebase.auth().currentUser;
@@ -653,6 +763,7 @@ function editsong(){
     setSongString(songDocData.data);
     hideLib();
     document.getElementById('openlib').innerHTML = 'Save and Return';
+    document.getElementById('openlib').style.display = 'inline';
   }).catch(function(e){
     console.log('could not open song' + e);
   });
@@ -667,7 +778,7 @@ function newsong(){
     if(timesig.pickup == 0) timesig.pickup = timesig.top;
     timesig.pickup = constrain(timesig.pickup,1,timesig.top);
     setupNewSong();
-    editsong();
+    // editsong();
     hideNewSong();
   }
 }
@@ -688,7 +799,7 @@ function deletesong(){
         if(usr){
           docRef.set({
             data: newusrdata,
-          }).then(function(){
+          },{merge:true}).then(function(){
             console.log('song successful removed from private library');
             var thumbs = document.getElementsByClassName("entry");
             for (var i = 0; i < thumbs.length; i++) {
@@ -729,7 +840,7 @@ function makePrivate(deleteAfter){
             let newusrdata = currentUserDocData.data.replace(songname+':1',songname+':0');// 0 means private, 1 means public
               docRef.set({
                 data: newusrdata,
-              }).then(function(){
+              },{merge:true}).then(function(){
                 let els = document.getElementsByClassName('entry');
                 for(let i = 0; i < els.length; i++){
                   if(els[i].firstChild.innerHTML == songname){
@@ -749,7 +860,7 @@ function makePrivate(deleteAfter){
                       if(cu){
                         docRef.set({
                           data: newusrdata,
-                        }).then(function(){
+                        },{merge:true}).then(function(){
                           console.log('song successful removed from private library');
                           var thumbs = document.getElementsByClassName("entry");
                           for (var i = 0; i < thumbs.length; i++) {
@@ -802,7 +913,7 @@ function goPublic(){
                 let newusrdata = currentUserDocData.data.replace(songname+':0',songname+':1');// 0 means private, 1 means public
                   docRef.set({
                     data: newusrdata,
-                  }).then(function(){
+                  },{merge:true}).then(function(){
                     let els = document.getElementsByClassName('entry');
                     for(let i = 0; i < els.length; i++){
                       if(els[i].firstChild.innerHTML == songname){
@@ -820,12 +931,16 @@ function goPublic(){
   }
 }
 function noUserSignedIn(){
+  usr = undefined;
   document.getElementById('entries').innerHTML = '';
   document.getElementById('openlib').style.display='none';
   document.getElementById('acctmenubtn').style.display='none';
   document.getElementById('welcome').innerHTML='Not signed in';
   console.log("not logged in yet");
   document.getElementById('Login').src = 'res/login.png';
+
+  setSongString("4,4,100,0,,,,");
+  showNewSong(false);
 }
 
 function promptUserBeforeLeaving(){
