@@ -28,10 +28,6 @@ function preload(){
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  for(let i = 0; i < 25; i++){
-    // notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
-    createjs.Sound.registerSound('sounds/'+nv[i]+'.wav', i);
-  }
   nameinput = createInput();
   nameinput.position(313,354);
   nameinput.size(216,31);
@@ -112,7 +108,10 @@ function setup() {
   //if not signed in, show new song
   if(document.getElementById('lib').style.display == 'none') showNewSong(false,true);
 }
-
+for(let i = 0; i < 25; i++){
+  // notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
+  createjs.Sound.registerSound('sounds/'+nv[i]+'.wav', i);
+}
 function draw() {
   playbacktempotime = 60000/timesig.tempo;
   textSize(12);
@@ -805,8 +804,8 @@ function uploadOnline(){
                 sth[i].querySelector('.innertext').innerText = songname;
               }
             }
-            document.getElementById('liboptions').style.display = 'none';
-            document.getElementById('songtitleinlib').innerHTML = '';
+            document.getElementById('liboptions').style.display = 'inline';
+            document.getElementById('songtitleinlib').innerHTML = songname;
             setEditMode(false);
             showLib();
           });

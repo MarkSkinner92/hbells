@@ -21,10 +21,6 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   attatchDemoClickListeners();
   textStyle(BOLD);
-  for(let i = 0; i < 25; i++){
-    // notesounds[i] = new Audio('sounds/'+onv[i]+'.wav');
-    createjs.Sound.registerSound('sounds/'+onv[i]+'.wav', i);
-  }
   songinput = createFileInput(getFile);
   songinput.position(6,6);
   songinput.size(96,30);
@@ -100,6 +96,11 @@ function setup() {
   }
   styleSettings();
 }
+
+for(let i = 0; i < 25; i++){
+  createjs.Sound.registerSound('sounds/'+onv[i]+'.wav', i);
+}
+
 function attatchDemoClickListeners(){
   let demos = document.getElementsByClassName('demo');
   for(let i = 0; i < demos.length; i++){
@@ -179,6 +180,14 @@ function draw() {
   image(soundssort,576,18);
   image(selector,642,37);
   image(selector,783,37);
+}
+function authStateSignedin(){
+  checkURLParams();
+  showLib();
+}
+function checkURLParams(){
+  let songDoc = new URLSearchParams(window.location.search).get('song');
+  if(songDoc) openSongByQuery(songDoc);
 }
 function callbackloadfile(){
   loadSong(currentsongdata);
@@ -793,11 +802,3 @@ function dontPromptUserBeforeLeaving(){
 }
 function accCreatedCallback(){}
 function deleteAccCallback(){}
-function authStateSignedin(){
-  checkURLParams();
-  showLib();
-}
-function checkURLParams(){
-  let songDoc = new URLSearchParams(window.location.search).get('song');
-  if(songDoc) openSongByQuery(songDoc);
-}
