@@ -18,7 +18,8 @@ let notesplayed = 0;
 let focused = false;
 let ineditmode = false;
 let ispublic = false;
-let prevbells = 0;
+let prevbells = 0, prevname = undefined;
+let songLoaded = false;
 
 var nv = ['G5','F5S','F5','E5','D5S','D5','C5S','C5','B4','A4S','A4','G4S','G4','F4S','F4','E4','D4S','D4','C4S','C4','B3','A3S','A3','G3S','G3'];
 function preload(){
@@ -38,6 +39,7 @@ function setup() {
   tempoinput = createInput();
   tempoinput.position(444,36);
   tempoinput.size(40,26);
+  tempoinput.attribute('autocomplete','off');
   nameinput.size(195,31);
   tempoinput.value(100);
   tempoM = createImg('composeRes/minus.png');
@@ -91,6 +93,7 @@ function setup() {
   barsP = createImg('composeRes/plus.png');
   barsP.mousePressed(_pickupsP);
   bars.value(4);
+  bars.attribute('autocomplete','off');
   pickupsM = createImg('composeRes/minus.png');
   pickupsM.mousePressed(_barsM);
   pickupsP = createImg('composeRes/plus.png');
@@ -103,6 +106,9 @@ function setup() {
   home = createImg('composeRes/home.png');
   home.position(12,14);
   home.parent('homeparent');
+  document.getElementById('editingname').addEventListener('change',e => {
+    timesig.name = cleanSongName(e.target.value) || timesig.name;
+  });
   //if not signed in, show new song
   if(document.getElementById('lib').style.display == 'none') showNewSong(false,true);
 }
@@ -252,26 +258,32 @@ function windowResized() {
 function mousePressed(){
   if(mode == 0){
   if(mouseY > 105 && mouseY < windowHeight-15){//roll
-    if(playback) _play();
-    let ok = true;
-      for(let i = 0; i < notedata.length; i++){
-        let foo = notedata[i];
-        if(foo.p == mousenote && foo.bar == mousebar && foo.beat == mousebeat && focused){
-          notedata.splice(i,1);
-          ok = false;
+    if(mouseX < 100){
+      playAudioNote(mousenote);
+    }
+    else{
+      if(playback) _play();
+      let ok = true;
+        for(let i = 0; i < notedata.length; i++){
+          let foo = notedata[i];
+          if(foo.p == mousenote && foo.bar == mousebar && foo.beat == mousebeat && focused){
+            notedata.splice(i,1);
+            ok = false;
+          }
         }
+        if(ok && focused){
+          console.log({p:mousenote,bar:mousebar,beat:mousebeat});
+            notedata.push({p:mousenote,bar:mousebar,beat:mousebeat});
+            playAudioNote(mousenote);
+            notesplayed = 0;
+          }
       }
-      if(ok && focused){
-          notedata.push({p:mousenote,bar:mousebar,beat:mousebeat});
-          playAudioNote(mousenote);
-          notesplayed = 0;
-        }
     }
   }
   if(cancelmenu){cancelmenu = false; mode = 0}
 }
 function keyPressed(){
-  if(key == ' ' && focused){
+  if(key == ' ' && focused && document.activeElement.tagName != 'INPUT'){
     _play();
   }
   if(keyCode == ENTER){
@@ -338,12 +350,14 @@ function getExportArray(){
   xport[6] = '';
   xport[7] = '';
   for(let i = 0; i < notedata.length; i++){
-    xport[index] = notedata[i].p;
-    index++;
-    xport[index] = notedata[i].bar;
-    index++;
-    xport[index] = notedata[i].beat;
-    index++;
+    if(notedata[i].p != null && notedata[i].bar != null && notedata[i].beat != null){
+      xport[index] = notedata[i].p;
+      index++;
+      xport[index] = notedata[i].bar;
+      index++;
+      xport[index] = notedata[i].beat;
+      index++;
+    }
   }
   return xport;
 }
@@ -361,21 +375,45 @@ function BigU(file) {
       notedata[i] = {p:Number(arr[index]),bar:Number(arr[index+1]),beat:Number(arr[index+2])};
       index+=3;
     }
-    document.getElementById('editingname').innerHTML = 'Editing: '+timesig.name;
-    ineditmode = true;
-    showCancel();
+    setEditingName(timesig.name);
+    setEditMode(true);
     if(usr){
       document.getElementById('openlib').innerHTML = 'Save and Return';
-      document.getElementById('openlib').style.display = 'inline';
     }
-    document.getElementById('editingname').style.display = 'inline';
-    document.getElementById('btn').style.display = 'inline';
     hideNewSong();
     hideLib();
     hideAcctMenu();
     upload.elt.value=null;
   }
   document.getElementById('')
+}
+function setEditingName(n){
+  document.getElementById('editingname').value = n;
+}
+function showEditingName(){
+  document.getElementById('editingname').style.display = 'inline';
+  document.getElementById('editingText').style.display = 'inline';
+}
+function hideEditingName(){
+  document.getElementById('editingname').style.display = 'none';
+  document.getElementById('editingText').style.display = 'none';
+}
+function setEditMode(v){
+  ineditmode = v;
+  if(v){
+    songLoaded = true;
+    showCancel();
+    promptUserBeforeLeaving();
+    document.getElementById('openlib').style.display = 'inline';
+    showEditingName();
+    document.getElementById('btn').style.display = 'inline';
+  }else{
+    hideCancel();
+    dontPromptUserBeforeLeaving();
+    document.getElementById('openlib').style.display = 'none';
+    hideEditingName();
+    document.getElementById('btn').style.display = 'none';
+  }
 }
 function setSongString(file){
   let arr = file.split(',');
@@ -494,6 +532,9 @@ function hideLogin() {
   if(!ineditmode) showNewSong();
 }
 function showLogin() {
+  document.getElementById('forgotpasswordbtn').innerText = 'Forgot Password';
+  document.getElementById('emaillogin').value = '';
+  document.getElementById('pswlogin').value = '';
   hideLib();
   hideNewSong();
   focused = false;
@@ -509,13 +550,6 @@ function signOutActions(){
   firebase.auth().signOut().then(function() {
     // Sign-out successful.
     document.getElementById('Login').src = 'res/login.png';
-    //delete clear all notes
-    deleteAllNotes();
-    ineditmode = false;
-    hideCancel();
-    document.getElementById('editingname').style.display = 'none';
-    document.getElementById('btn').style.display = 'none';
-    document.getElementById('openlib').innerHTML = 'Open Library';
   }).catch(function(error) {
     console.log('could not sign out: '+error);
   });
@@ -523,18 +557,24 @@ function signOutActions(){
 function hideSignin() {
   document.getElementById("Signindiv").style.display = "none";
   focused = true;
-  if(!ineditmode) showNewSong();
+  if(!ineditmode && !songLoaded) showNewSong();
 }
 function showSignin() {
   if(usr){
     signOutActions();
     return;
   }
+  document.getElementById('email').value = '';
+  document.getElementById('psw').value = '';
+  document.getElementById('dispname').value = '';
   document.getElementById("Signindiv").style.display = "inline";
   hideLib();
   hideAcctMenu();
   hideNewSong();
   focused = false;
+}
+function accCreatedCallback(){
+  console.log('User Acc Created');
 }
 function hideAcctMenu(){
   document.getElementById('acctmenu').style.display = "none";
@@ -548,7 +588,8 @@ function hideAccDone(){
 }
 function showLib(){
   if(ineditmode){
-    if(getSongString().length >= 20) uploadOnline();
+    // uploadOnline();
+    setEditMode(false);
   }
   hideNewSong();
   hideAcctMenu();
@@ -559,7 +600,6 @@ function showLib(){
 }
 function hideLib(){
   document.getElementById('lib').style.display = 'none';
-  // document.getElementById('openlib').style.display = 'inline';
 }
 function closeLib(){
   if(!ineditmode){
@@ -573,6 +613,9 @@ function showNewSong(cancellable,donthidelib){
   if(!donthidelib) hideLib();
   hideAcctMenu();
   focused = false;
+  document.getElementById('bpb').value = '';
+  document.getElementById('pb').value = '';
+  document.getElementById('newsongname').value = '';
   if(cancellable){
     document.getElementById('newSongCancel').style.display = 'unset';
   }else{
@@ -585,25 +628,23 @@ function hideNewSong(){
   document.getElementById('newsong').style.display = 'none';
 }
 function cleanSongName(name){
-  return name.replace(/[^a-zA-Z0-9\s_]/g, '');
+  return (name.replace(/[^a-zA-Z0-9\s_]/g, '').substring(0,50));
 }
-
 
 function setupNewSong(){
   let validsongname = cleanSongName(document.getElementById('newsongname').value);
-  document.getElementById('editingname').innerHTML = 'Editing: '+validsongname.split(':')[0];
+  setEditingName(validsongname.split(':')[0]);
   timesig.name = validsongname;
-  ineditmode = true;
-  showCancel();
+  setEditMode(true);
   focused = true;
   ispublic = false;
   prevbells = 0;
+  prevname = undefined;
   if(usr){
     document.getElementById('openlib').innerHTML = 'Save and Return';
-    document.getElementById('openlib').style.display = 'inline';
+  }else{
+    document.getElementById('openlib').innerHTML = 'Login to save';
   }
-  document.getElementById('editingname').style.display = 'inline';
-  document.getElementById('btn').style.display = 'inline';
 }
 
 //createSongTileFromTimesig();
@@ -651,14 +692,12 @@ function showCancel(){
   document.getElementById('cancelEditmode').style.display = 'inline';
 }
 function hideCancel(){
-document.getElementById('cancelEditmode').style.display = 'none';
+  document.getElementById('cancelEditmode').style.display = 'none';
 }
 function cancelEditmode(){
-  ineditmode = false;
-  document.getElementById('editingname').style.display = 'none';
-  document.getElementById('btn').style.display = 'none';
+  setEditMode(false);
   setSongString("4,4,100,0,,,,");
-  hideCancel();
+  songLoaded = false;
   if(usr){
     showLib();
   }else{
@@ -673,6 +712,11 @@ function clickedOnSong(e){
   else openSongEditMenu(e.target);
 }
 function openSongEditMenu(targetdom){
+  let entries = document.getElementsByClassName('entry');
+  for(let i = 0; i < entries.length; i++){
+    entries[i].style.border = 'none';
+  }
+  targetdom.style.border = 'solid black 3px';
   let btn = document.getElementById('gopublic');
   document.getElementById('liboptions').style.display = 'inline';
   document.getElementById('songtitleinlib').innerHTML = targetdom.firstChild.innerHTML;
@@ -681,6 +725,14 @@ function openSongEditMenu(targetdom){
   if(hasClass(targetdom, 'public')) btn.innerHTML = 'Make Private';
   else btn.innerHTML = 'Make Public';
   document.getElementById('deletesong').innerHTML = "Delete Forever";
+}
+function playInPlayer(){
+  let c = document.createElement('a');
+  let songname = document.getElementById('songtitleinlib').innerHTML;
+  let songDoc = songname+':'+usr.displayName+':'+usr.uid;
+  c.href = `play.html?song=${encodeURIComponent(songDoc)}`;
+  c.click();
+  c.remove();
 }
 //save file to web button (save -> save to web menu)
 function uploadOnline(){
@@ -693,69 +745,121 @@ function uploadOnline(){
   if(ineditmode){
     //save to database and return to console
     let songstring = getSongString();
+    let songname = cleanSongName(timesig.name);
     if(usr){
-      if(ispublic){
-        db.collection("Songlists").doc("list1").get().then(function(list){
-          let bells = songstring.split(',')[3];
-          console.log(ispublic, prevbells, bells)
-          let songlist = list.data().data.replace((songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(prevbells)+','),(songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(bells)+','));
-          db.collection("Songlists").doc("list1").set({
-            data: songlist,
+      songLoaded = false;
+      if(prevname == songname || !prevname){
+
+        //find the song name in the big songlist and replace it with the new song name and bell count
+        if(ispublic){
+          db.collection("Songlists").doc("list1").get().then(function(list){
+            let bells = songstring.split(',')[3];
+            console.log(ispublic, prevbells, bells)
+            let songlist = list.data().data.replace((songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(prevbells)+','),(songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(bells)+','));
+            db.collection("Songlists").doc("list1").set({
+              data: songlist,
+            });
+          }).catch(function(e){
+            console.log('in uploadOnline: '+e);
           });
-        }).catch(function(e){
-          console.log('in uploadOnline: '+e);
+        }
+
+        db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).set({
+          data: songstring,
+        }).then(function(){
+          deleteAllNotes();
+          let sth = document.getElementsByClassName('entry');
+          let songExists = false;
+          for(let i = 0; i < sth.length; i++){
+            songExists = (songExists || sth[i].querySelector('.innertext').innerText == songname);
+          }
+          if(!songExists) createSongTileFromTimesig();
+        });
+        setEditMode(false);
+        showLib();
+      }
+      else if(prevname){
+        //find the song name in the big songlist and replace it with the new song name and bell count
+        if(ispublic){
+          db.collection("Songlists").doc("list1").get().then(function(list){
+            let bells = songstring.split(',')[3];
+            console.log(ispublic, prevbells, bells)
+            let songlist = list.data().data.replace((prevname+':'+usr.displayName+':'+usr.uid+':'+parseInt(prevbells)+','),(songname+':'+usr.displayName+':'+usr.uid+':'+parseInt(bells)+','));
+            db.collection("Songlists").doc("list1").set({
+              data: songlist,
+            });
+          }).catch(function(e){
+            console.log('in uploadOnline: '+e);
+          });
+        }
+
+        db.collection("Songs").doc(prevname+':'+usr.displayName+':'+usr.uid).delete().then(()=>{
+          db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).set({
+            data: songstring,
+          }).then(function(){
+            deleteAllNotes();
+            let sth = document.getElementsByClassName('entry');
+            let songExists = false;
+            for(let i = 0; i < sth.length; i++){
+              if(sth[i].querySelector('.innertext').innerText == prevname){
+                sth[i].querySelector('.innertext').innerText = songname;
+              }
+            }
+            document.getElementById('liboptions').style.display = 'none';
+            document.getElementById('songtitleinlib').innerHTML = '';
+            setEditMode(false);
+            showLib();
+          });
+        });
+
+        let docRef = db.collection("Users").doc(usr.uid);
+        docRef.get().then(function(doc) {
+          currentUserDocData=doc.data();
+          console.log(prevname,songname);
+          let newusrdata = currentUserDocData.data.replace(prevname,songname);
+          if(usr){
+            docRef.set({
+              data: newusrdata,
+            },{merge:true}).then(function(){
+              console.log('renamed user song');
+            });
+          }
         });
       }
-
-      let songname = timesig.name;
-      db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).set({
-        data: songstring,
-      }).then(function(){
-        deleteAllNotes();
-        let sth = document.getElementsByClassName('entry');
-        let songExists = false;
-        for(let i = 0; i < sth.length; i++){
-          songExists = (songExists || sth[i].querySelector('.innertext').innerText == songname);
-        }
-        if(!songExists) createSongTileFromTimesig();
-      });
+    }else{
+      showLogin();
     }
-    ineditmode = false;
-    hideCancel();
-    showLib();
-    document.getElementById('editingname').style.display = 'none';
-    document.getElementById('btn').style.display = 'none';
-    document.getElementById('openlib').innerHTML = 'Open Library';
   }
   else if(usr){
     //upload song right to library
     showLib();
   }else{
-    //set some flag that will upload the song after they authenticate
     showLogin();
   }
 }
+function authStateSignedin(){
+  if(!songLoaded) showLib();
+  document.getElementById('openlib').innerHTML = 'Save and Return';
+}
 function editsong(){
-  ineditmode=true;
-  showCancel();
   focused = true;
-  document.getElementById('editingname').style.display = 'inline';
-  document.getElementById('btn').style.display = 'inline';
   usr = firebase.auth().currentUser;
   timesig.name = document.getElementById('songtitleinlib').innerHTML;
   //load song from database
-  document.getElementById('editingname').innerHTML = 'Editing: ' +timesig.name;
+  setEditingName(timesig.name);
   console.log(timesig.name+':'+usr.displayName+':'+usr.uid);
   var docRef = db.collection("Songs").doc(timesig.name+':'+usr.displayName+':'+usr.uid);
   docRef.get().then(function(doc) {
     songDocData=doc.data();
     prevbells = songDocData.data.split(',')[3];
+    prevname = timesig.name;
     setSongString(songDocData.data);
     hideLib();
     document.getElementById('openlib').innerHTML = 'Save and Return';
-    document.getElementById('openlib').style.display = 'inline';
+    setEditMode(true);
   }).catch(function(e){
     console.log('could not open song' + e);
+    prevname = undefined;
   });
 }
 function newsong(){
@@ -768,47 +872,53 @@ function newsong(){
     if(timesig.pickup == 0) timesig.pickup = timesig.top;
     timesig.pickup = constrain(timesig.pickup,1,timesig.top);
     setupNewSong();
-    // editsong();
     hideNewSong();
   }else{
     document.getElementById('newsongname').style.border = 'solid red';
+    document.getElementById('newsongname').focus();
   }
 }
 function deletesong(){
   let usr = firebase.auth().currentUser;
   let songname = document.getElementById('songtitleinlib').innerHTML;
-  if(document.getElementById('deletesong').innerHTML == "Click again to confirm"){
+  if(document.getElementById('deletesong').innerHTML == "Click again to confirm delete"){
     if(ispublic) makePrivate(true);
     else{
       console.log(songname+':'+usr.displayName+':'+usr.uid);
       db.collection("Songs").doc(songname+':'+usr.displayName+':'+usr.uid).delete().then(function() {
       console.log("Song doc successfully deleted!");
+      removeThumb(songname);
       //delete personal song index .replace('song name','');
-      var docRef = db.collection("Users").doc(usr.uid);
-      docRef.get().then(function(doc) {
-        currentUserDocData=doc.data();
-        let newusrdata = currentUserDocData.data.replace(songname+':0'+',','').replace(songname+':1'+',','');
-        if(usr){
-          docRef.set({
-            data: newusrdata,
-          },{merge:true}).then(function(){
-            console.log('song successful removed from private library');
-            var thumbs = document.getElementsByClassName("entry");
-            for (var i = 0; i < thumbs.length; i++) {
-              if(thumbs[i].firstChild.innerHTML == songname){
-                thumbs[i].remove();
-                i--;
-              }
-            }
-            document.getElementById('liboptions').style.display = 'none';
-            document.getElementById('songtitleinlib').innerHTML = '';
-          });
-        }
-      });
+      replacePersonalSongList(songname,'');
     });
   }
   }
-  document.getElementById('deletesong').innerHTML = "Click again to confirm";
+  document.getElementById('deletesong').innerHTML = "Click again to confirm delete";
+}
+function replacePersonalSongList(a,b){
+  var docRef = db.collection("Users").doc(usr.uid);
+  docRef.get().then(function(doc) {
+    currentUserDocData=doc.data();
+    let newusrdata = currentUserDocData.data.replace(a+':0'+',',b).replace(a+':1'+',',b);
+    if(usr){
+      docRef.set({
+        data: newusrdata,
+      },{merge:true}).then(function(){
+        console.log('song successful removed from private library');
+      });
+    }
+  });
+}
+function removeThumb(songname){
+  var thumbs = document.getElementsByClassName("entry");
+  for (var i = 0; i < thumbs.length; i++) {
+    if(thumbs[i].firstChild.innerHTML == songname){
+      thumbs[i].remove();
+      i--;
+    }
+  }
+  document.getElementById('liboptions').style.display = 'none';
+  document.getElementById('songtitleinlib').innerHTML = '';
 }
 function makePrivate(deleteAfter){
   let btn = document.getElementById('gopublic');
@@ -879,7 +989,7 @@ function goPublic(){
   let btn = document.getElementById('gopublic');
   let songname = document.getElementById('songtitleinlib').innerHTML;
   if(btn.innerHTML == 'Make Public'){
-    btn.innerHTML = 'Click to Confirm';
+    btn.innerHTML = 'Click to confirm making song public';
   }else{
     if(btn.innerHTML == 'Make Private'){
       //make the song private
@@ -922,17 +1032,23 @@ function goPublic(){
     }
   }
 }
+function deleteAccCallback(){}
 function noUserSignedIn(){
   usr = undefined;
   document.getElementById('entries').innerHTML = '';
-  document.getElementById('openlib').style.display='none';
   document.getElementById('acctmenubtn').style.display='none';
   document.getElementById('welcome').innerHTML='Not signed in';
-  console.log("not logged in yet");
   document.getElementById('Login').src = 'res/login.png';
+  document.getElementById('openlib').innerHTML = 'Login to save';
 
-  setSongString("4,4,100,0,,,,");
-  showNewSong(false);
+  if(!songLoaded){
+    setEditMode(false)
+    setSongString("4,4,100,0,,,,");
+    showNewSong(false);
+  }else{
+    focused=true;
+    setEditMode(true);
+  }
 }
 
 function promptUserBeforeLeaving(){
@@ -943,4 +1059,3 @@ function promptUserBeforeLeaving(){
 function dontPromptUserBeforeLeaving(){
   window.onbeforeunload = null;
 }
-promptUserBeforeLeaving();

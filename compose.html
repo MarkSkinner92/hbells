@@ -65,8 +65,11 @@
     font-family: 'Manjari', Arial;
     font-size: 25px;
   }
-</style>
-<style>
+    *{
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+    }
     .library{
         display: none;
         position: absolute;
@@ -220,7 +223,8 @@
 <img onclick="hideSignin(); showLogin()" src = 'res/login.png' id="Login" style="position: absolute; z-index: 98; top: 10px; color: black; right:8px;">
 <img onclick="hideLogin(); showSignin()" src = 'res/signup.png' id="Signup" style="position: absolute; z-index: 98; top: 40px; color: black; right:8px;">
 <p id='welcome' style="position: absolute; z-index: 98; top: 0px; color: #FFF; right:105px; font-family: Arial">Not signed in</p>
-<p id="editingname" style="display: inline;position: absolute;top: -3px;color: rgb(255, 255, 255);left: 710px;font-family: Arial;"></p>
+<input id="editingname" style="display: none;position: absolute;top: 8px;left: 772px;font-family: 'Manjari',sans-serif;font-size: 16px;font-weight: bold;width: 200px;height: 25px;background: #113844;border-radius: 5px;border: none;color: white;padding-top: 4px;padding-left: 5px;">
+<p id="editingText" style="display: none;position: absolute;top: -3px;color: rgb(255, 255, 255);left: 710px;font-family: 'Manjari';font-weight: bold;font-size: 17px;">Editing:</p>
 <button id='acctmenubtn' onclick="showAcctMenu();hideNewSong();focused = false" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
 <div id = 'acctmenu' class='newsong' style="height:400px">
   <h1 class = "headertextlib">Account Settings</h1>
@@ -249,7 +253,7 @@
     <label for="pswlogin"><b class = "center">Password</b></label>
     <input id='pswlogin' class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
 
-    <button onclick="forgotPassword()" class="formbutton btn">Forgot Password</button>
+    <button id='forgotpasswordbtn'onclick="forgotPassword()" class="formbutton btn">Forgot Password</button>
     <button onclick="hideLogin()" class="formbutton btn">Cancel</button>
     <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton btn">Login</button>
   </div>
@@ -267,7 +271,7 @@
     <label><b class = "center smallertext">Display Name</b></label>
     <input id="dispname" class = "fullinput" type="text" placeholder="Enter Nickname" required>
 
-    <button id="signinenter" onclick="createAccount()" class="formbutton btn">Create Account</button><button onclick="hideSignin()" class="formbutton btn btn">Cancel</button>
+    <button id="signinenter" onclick="createAccount();" class="formbutton btn">Create Account</button><button onclick="hideSignin()" class="formbutton btn btn">Cancel</button>
   </div>
 </div>
 <a id = 'homeparent' href="index.html" style="position: fixed;z-index:100;"></a>
@@ -278,24 +282,22 @@
      <div id='liboptions' style="padding: 0; margin: 0; border: none; display:none">
          <h1 id='songtitleinlib' style="text-align: center; font-family: Arial; color: #081f26; font-size: 20px">Song Name and song title if its a long name</h1>
          <button onclick="editsong();"class="ctrlbutton">Edit Song</button>
-         <!-- <button class="ctrlbutton">Download</button> -->
-         <button id='gopublic' onclick="goPublic()" class="ctrlbutton" style="background-color: #e69494">Make Public</button>
-         <button onclick="deletesong()" id='deletesong' class="ctrlbutton" style="background-color: #e69494">Delete Forever</button>
+         <button id='playinplayer' onclick="playInPlayer()" class="ctrlbutton">Play (open in player)</button>
+         <button id='gopublic' onclick="goPublic()" class="ctrlbutton">Make Public</button>
+         <button onclick="deletesong()" id='deletesong' class="ctrlbutton">Delete Forever</button>
      </div>
   </div>
   <button class="add buttonLib" onClick="showNewSong(true)" style='left:calc(50% - 123px)'>New Song</button>
   <button onclick="closeLib(); hideLib()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Close Library</button>
-  <!-- <button class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Upload</button> -->
 </div>
 <div id = 'newsong' class='newsong'>
        <h1 class = "headertextlib">New Song</h1>
        <div class="entries" style="width: calc(100% - 16px)">
-           <h3 style="color:#185162;margin:5px">You can't easily change this later</h3>
-           <input id='bpb'class="inputmenu" type="number" placeholder="Beats Per Bar (default 4)">
-           <input id='pb'class="inputmenu" type="number" placeholder="Pickup Beats (default 0)">
-           <input id="newsongname" class="inputmenu" type="text" placeholder="Name of song">
+           <input id='bpb'autocomplete="off"class="inputmenu" type="number" placeholder="Beats Per Bar (default 4)">
+           <input id='pb'autocomplete="off"class="inputmenu" type="number" placeholder="Pickup Beats (default 0)">
+           <input id="newsongname"autocomplete="off"class="inputmenu" type="text" placeholder="Name of song">
        </div>
-       <button id='newSongClick'onclick="newsong()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Done</button>
+       <button id='newSongClick'onclick="newsong()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Start Composing!</button>
        <button id='newSongCancel'onclick="showLib()" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
    </div>
 <button id='openlib' class="btn" onclick="uploadOnline()" style="position:absolute; display: none;top: 40px; left: 646px; background-color: #27dfde; color:#000; border:none; border-radius:5px; width:153px;height:27px;">Open My Library</button>

@@ -126,7 +126,7 @@ auth.onAuthStateChanged(function(user) {
           console.log("couldn't make user document: "+e);
         }); //add user specific document
     });
-    showLib();
+    authStateSignedin();
   } else {
     // No user is signed in.
     noUserSignedIn();
@@ -166,6 +166,7 @@ function deleteAcct(psw){
           console.log('user deleted');
           hideDeleteAcctmenu();
           hideAcctMenu();
+          deleteAccCallback();
         }).catch(function(e) {
           console.log('something went wrong deleting user: '+e);
         });
@@ -186,6 +187,9 @@ function forgotPassword(){
   if(!email) alert("Please enter your account's email");
   else{
     auth.sendPasswordResetEmail(email).then(function() {
+      document.getElementById('forgotpasswordbtn').innerText = 'Resend Email';
+      document.getElementById('forgotpasswordbtn').innerText = 'Forgot Password';
+      document.getElementById('pswlogin').innerText = '';
       alert('Sent a password reset email to ' + email);
     }).catch(function(error) {
       alert('Could not send an email to ' + email);
@@ -228,7 +232,12 @@ function buyMoreSongs(){
     });
   }).catch(err => {console.log('error',err)});
 }
-
+function trySetDisplayName(displayName){
+  if(firebase.auth().currentUser.displayName == null) firebase.auth().currentUser.updateProfile({displayName: displayName}).then(e => {
+    accCreatedCallback();
+    hideSignin();
+  }).catch(err => {console.log('set display name error',err)});
+}
 function createFirebaseAccount({email,password,displayName}){
   auth.createUserWithEmailAndPassword(email, password).then(function(result) {
   console.log('created account');
@@ -236,11 +245,13 @@ function createFirebaseAccount({email,password,displayName}){
     usr = result.user;
     db.collection("Users").doc(result.user.uid).set({songplays: startlimit, data:''}).then(function(re){
       console.log('DOCUMENT WAS CREATED',re);
+      trySetDisplayName(displayName);
+      setTimeout(()=>{trySetDisplayName(displayName)},400);
+      setTimeout(()=>{trySetDisplayName(displayName)},800);
     }).catch(function(e){
       console.log("couldn't make user document: "+e);
+      hideSignin();
     }); //add user specific document
-    hideSignin();
-    return result.user.updateProfile({displayName: displayName});
   }).catch(function(error) {
     // Handle Errors here.
     var errorCode = error.code;

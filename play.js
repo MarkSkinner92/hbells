@@ -43,6 +43,7 @@ function setup() {
   barinput.size(40,26);
   barinput.position(290,41);
   barinput.value(1);
+  barinput.attribute('autocomplete','off');
   barM = createImg('playRes/minus.png');
   barM.position(274,45);
   barM.mousePressed(_barM);
@@ -53,6 +54,7 @@ function setup() {
   tempoinput.position(385,41);
   tempoinput.size(47,26);
   tempoinput.value(100);
+  tempoinput.attribute('autocomplete','off');
   tempoM = createImg('playRes/minus.png');
   tempoM.position(369,45);
   tempoM.mousePressed(_tempoM);
@@ -64,6 +66,7 @@ function setup() {
   transposeinput.position(492,41);
   transposeinput.value(0);
   transposeinput.input(updatetranspose);
+  transposeinput.attribute('autocomplete','off');
   transM = createImg('playRes/minus.png');
   transM.position(475,45);
   transM.mousePressed(_transM);
@@ -91,9 +94,11 @@ function setup() {
   home.position(12,14);
   home.parent('homeparent');
 
-  currentsongdata = loadStrings('playRes/lib/songs/London Bridge (6 bells).txt', callbackloadfile);
+  if(!new URLSearchParams(window.location.search).get('song') || !usr){
+    currentsongdata = loadStrings('playRes/lib/songs/London Bridge (6 bells).txt', callbackloadfile);
+    showLib();
+  }
   styleSettings();
-  showLib();
 }
 function attatchDemoClickListeners(){
   let demos = document.getElementsByClassName('demo');
@@ -349,25 +354,25 @@ function redocolor(n){
   if(colormode.value() == '8 note set'){
     switch(onv[n].charAt(0)){
       case 'A':
-        return color('#2e6bc0');
+        return color('#25579c');
       break;
       case 'B':
-        return color('#8a208c');
+        return color('#761c78');
       break;
       case 'C':
-        return color('#ef1111');
+        return color('#9c0c0c');
       break;
       case 'D':
-        return color('#ef6211');
+        return color('#9e4009');
       break;
       case 'E':
-        return color('#e9ef11');
+        return color('#989c09');
       break;
       case 'F':
-        return color('#26ef11');
+        return color('#17910a');
       break;
       case 'G':
-        return color('#49bdf4');
+        return color('#2d7596');
       break;
     }
   }
@@ -564,6 +569,9 @@ function hideLogin() {
   focused = true;
 }
 function showLogin() {
+  document.getElementById('forgotpasswordbtn').innerText = 'Forgot Password';
+  document.getElementById('emaillogin').value = '';
+  document.getElementById('pswlogin').value = '';
   hideLib();
   hideAcctMenu();
   focused = false;
@@ -593,6 +601,9 @@ function showSignin() {
     signOutActions();
     return;
   }
+  document.getElementById('email').value = '';
+  document.getElementById('psw').value = '';
+  document.getElementById('dispname').value = '';
   document.getElementById("Signindiv").style.display = "inline";
   hideLib();
   focused = false;
@@ -643,8 +654,6 @@ function clickedOnSong(e){
   else openSongFromDiv(e.target);
 }
 function openSongFromDiv(targetdom){
-  // document.getElementById('liboptions').style.display = 'inline';
-  // document.getElementById('songtitleinlib').innerHTML = targetdom.firstChild.innerHTML;
   document.getElementById("songinfo").innerHTML = targetdom.innerText;
   usr = firebase.auth().currentUser;
   timesig.name = targetdom.firstChild.innerHTML;
@@ -656,7 +665,9 @@ function openSongFromDiv(targetdom){
   }
   else{
     let songlookup = timesig.name.split(',')[0]+':'+usr.displayName+':'+usr.uid;
+
     try{
+      //remove public/private identifier?
       songlookup = targetdom.querySelector("#path").innerText.split(':');
       songlookup.pop();
       songlookup = songlookup.join(':');
@@ -664,17 +675,21 @@ function openSongFromDiv(targetdom){
     catch{
       console.log('using local songlookup');
     }
-    console.log('song im looking for',songlookup);
-    var docRef = db.collection("Songs").doc(songlookup);
-    docRef.get().then(function(doc) {
-      songDocData=doc.data();
-      console.log('loading song');
-      loadSong(songDocData.data.split(','));
-      hideLib();
-    }).catch(function(e){
-      console.log('no song doc exists with that name   ' + songlookup,e);
-    });
+    openSongByQuery(songlookup);
   }
+}
+function openSongByQuery(songlookup){
+  console.log('song im looking for',songlookup);
+  var docRef = db.collection("Songs").doc(songlookup);
+  docRef.get().then(function(doc) {
+    songDocData=doc.data();
+    console.log('loading song');
+    document.getElementById("songinfo").innerHTML = songlookup.split(':')[0];
+    loadSong(songDocData.data.split(','));
+    hideLib();
+  }).catch(function(e){
+    console.log('no song doc exists with that name   ' + songlookup,e);
+  });
 }
 function genPublicThumbs(){
   var docRef = db.collection("Songlists").doc('list1');
@@ -775,4 +790,14 @@ function promptUserBeforeLeaving(){
 }
 function dontPromptUserBeforeLeaving(){
   window.onbeforeunload = null;
+}
+function accCreatedCallback(){}
+function deleteAccCallback(){}
+function authStateSignedin(){
+  checkURLParams();
+  showLib();
+}
+function checkURLParams(){
+  let songDoc = new URLSearchParams(window.location.search).get('song');
+  if(songDoc) openSongByQuery(songDoc);
 }

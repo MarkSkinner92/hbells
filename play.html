@@ -22,6 +22,11 @@
       .image-upload>input {
         display: none;
       }
+      *{
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+      }
       img{
           cursor: pointer;
       }
@@ -229,7 +234,7 @@
       <label for="pswlogin"><b class = "center">Password</b></label>
       <input id='pswlogin' class = "fullinput" type="password" placeholder="Enter Password" name="psw" required>
 
-      <button onclick="forgotPassword()" class="formbutton btn">Forgot Password</button>
+      <button id='forgotpasswordbtn'onclick="forgotPassword()" class="formbutton btn">Forgot Password</button>
       <button onclick="hideLogin()" class="formbutton btn">Cancel</button>
       <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton btn">Login</button>
     </div>
