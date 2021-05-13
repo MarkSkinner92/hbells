@@ -51,6 +51,16 @@
       font-family: 'Manjari', sans-serif;
       position: relative;
     }
+    #ux{
+      display: none;
+      background: rgba(255,0,0,0.8);
+      margin-top:5px;
+    }
+    #uxtext{
+      font-family: 'Manjari', sans-serif;
+      padding:20px;
+      margin:0px;
+    }
     button:hover {
       filter: brightness(85%);
     }
@@ -100,7 +110,9 @@
       return check;
     };
     window.addEventListener('DOMContentLoaded',()=>{
-      if(!window.mobileCheck()){
+      if(window.mobileCheck()){
+        document.getElementById('ux').style.display = 'block';
+      }else{
         document.getElementById('button2').style.display = 'inline';
       }
     });
@@ -133,6 +145,9 @@
       <div class="home content" style="width:100%; height:300px; text-align:center; padding:0px">
       <a href="play.html" id='button1' style="line-height:100px">Play</a>
       <a href="compose.html" id='button2'style="display:none;line-height:45px">Compose</a>
+      <div id='ux'>
+        <h1 id='uxtext'>Use a PC for the best experience</h1>
+      </div>
     </div>
 
   <!-- about -->
