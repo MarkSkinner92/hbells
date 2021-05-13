@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>VexBox test</title>
+    <style media="screen">
+      .highlight{
+        background: none;
+        border: solid 2px;
+        font-family: sans-serif;
+        font-size: 17px;
+        cursor: pointer;
+        margin:3px;
+        display: inline-flex;
+      }
+      .highlight:hover{
+        background:#EEE
+      }
+      .noteText{
+        margin:10px;
+      }
+      .colorSelector{
+        margin:8px;
+      }
+      .highlight[data-checked$="true"]{
+        background: springgreen;
+      }
+      .highlights{
+        padding: 10px;
+        width: calc(100% - 20px);
+        text-align: center;
+        border: solid 2px;
+      }
+      .divHeader{
+        margin-bottom:2px;
+      }
+      .center{
+        text-align:center;
+      }
+      .itext{
+        display:inline-block;
+      }
+      .textInput{
+        display:inline-block;
+      }
+      .btn{
+        background: aquamarine;
+        border: solid 2px;
+        width: 120px;
+        height: 40px;
+        font-family: sans-serif;
+        font-size: 17px;
+        cursor: pointer;
+        margin:3px;
+        display:block;
+        margin-left: calc(50% - 60px);
+      }
+      .btn:hover{
+        filter:brightness(85%)
+      }
+      .pageCanvas{
+        border:solid 2px;
+        width:calc(70% - 100px);
+        margin-left:calc(15% + 50px);
+        width:calc(80% - 100px);
+        margin-left:calc(10% + 50px);
+      }
+      canvas,div{
+        box-shadow:4px 4px 10px #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class='title center'>Handybells Sheetmusic</h1>
+    <p class='divHeader center'>Click the boxes below to highlight those bells (optinal)</p>
+    <div class='highlights' id='highlights'></div>
+    <input onchange="Sohn(this)"type='checkbox'>Show only highlighted notes |</input>
+    <input onchange="Chn(this)"type='checkbox'checked='true'>Color highlighted notes</input>
+    <p class='itext'>| Song Title</p>
+    <input onchange='redraw()'id='songname'class='textInput'placeholder="Write song title here"></input>
+    <p class='itext'>Composer/Arranger</p>
+    <input id='credit'onchange='redraw()'class='textInput'placeholder="ex. Composed by John Doe"></input>
+    <button onclick="print_canvas()"class='btn'>Print</button>
+    <button onclick="window.close()"style="background:white"class='btn'>Close</button>
+    <canvas id='canvas1'width='1275'height='1650'class='pageCanvas'></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vexflow/3.0.9/vexflow-min.js" integrity="sha512-le/+X9Wjo8roJpCBunTPOGzGGhCqyXsbxgoEwngieMRVDieKxfHusDD6iFJqw8RUGkfj7se7Nc6cf4NbLUPDzA==" crossorigin="anonymous"></script>
+    <script src="sheetmusic.js" charset="utf-8"></script>
+  </body>
+</html>

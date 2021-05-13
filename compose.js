@@ -113,6 +113,7 @@ for(let i = 0; i < 25; i++){
   createjs.Sound.registerSound('sounds/'+nv[i]+'.wav', i);
 }
 function draw() {
+  if(firstdraw) hideOverlay();
   playbacktempotime = 60000/timesig.tempo;
   textSize(12);
   timesig.tempo = tempoinput.value();
@@ -331,6 +332,16 @@ function BigD(){
 }
 function getSongString(){
   return getExportArray().join(',');
+}
+function getSongStringURL(){
+  return `sheetmusic.html?s=${encodeURIComponent(getExportArray().join('i'))}&name=${encodeURIComponent(timesig.name)}`;
+}
+function openSongStringURL(){
+  let ele = document.createElement('a');
+  ele.href = window.location.origin+'/'+getSongStringURL();
+  ele.target = '_blank';
+  ele.click();
+  ele.remove();
 }
 function getExportArray(){
   let xport = [];
@@ -689,9 +700,11 @@ function playAudioNote(n){
 }
 function showCancel(){
   document.getElementById('cancelEditmode').style.display = 'inline';
+  document.getElementById('showSheetmusic').style.display = 'inline';
 }
 function hideCancel(){
   document.getElementById('cancelEditmode').style.display = 'none';
+  document.getElementById('showSheetmusic').style.display = 'none';
 }
 function cancelEditmode(){
   setEditMode(false);
@@ -1049,7 +1062,16 @@ function noUserSignedIn(){
     setEditMode(true);
   }
 }
-
+var firstdraw = true;
+function hideOverlay(){
+  firstdraw = false;
+  document.getElementById('hideonload').style.background = 'none';
+  document.getElementById('loadingIcon').remove();
+  setTimeout(removeOverlay,1000);
+}
+function removeOverlay(){
+  document.getElementById('hideonload').remove();
+}
 function promptUserBeforeLeaving(){
   window.onbeforeunload = function() {
       return true;

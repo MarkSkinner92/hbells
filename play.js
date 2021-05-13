@@ -108,6 +108,7 @@ function attatchDemoClickListeners(){
   }
 }
 function draw() {
+  if(firstdraw) hideOverlay();
   background('#f9faeb');
   noStroke();
   //playback
@@ -211,6 +212,47 @@ function styleSettings(){
 }
 function getFile(file){
   loadSong(file.data.split('\n'));
+}
+function getSongString(){
+  return getExportArray().join(',');
+}
+function getSongStringURL(){
+  return `sheetmusic.html?s=${encodeURIComponent(getExportArray().join('i'))}&name=${encodeURIComponent(timesig.name)}`;
+}
+function openSongStringURL(){
+  let ele = document.createElement('a');
+  ele.href = window.location.origin+'/'+getSongStringURL();
+  ele.target = '_blank';
+  ele.click();
+  ele.remove();
+}
+function getExportArray(){
+  let xport = [];
+  let index = 8;
+  let expfile = '';
+  xport[0] = timesig.pickup;
+  xport[1] = timesig.top;
+  xport[2] = timesig.tempo;
+
+  var counts = {};
+  for (var i = 0; i < notedata.length; i++) {counts[notedata[i].p] = 1 + (counts[notedata[i].p] || 0);}
+  xport[3] = Object.keys(counts).length;//bell count
+  if(xport[3] === undefined) xport[3] = 0;
+  xport[4] = '';
+  xport[5] = '';
+  xport[6] = '';
+  xport[7] = '';
+  for(let i = 0; i < notedata.length; i++){
+    if(notedata[i].p != null && notedata[i].bar != null && notedata[i].beat != null){
+      xport[index] = notedata[i].p;
+      index++;
+      xport[index] = notedata[i].bar;
+      index++;
+      xport[index] = notedata[i].beat;
+      index++;
+    }
+  }
+  return xport;
 }
 //data is an array of strings, the first 8 are metadata
 //the next are pairs of 3, {note pitch form 0-24 (high to low), bar, beat}
@@ -695,6 +737,7 @@ function openSongByQuery(songlookup){
     console.log('loading song');
     document.getElementById("songinfo").innerHTML = songlookup.split(':')[0];
     loadSong(songDocData.data.split(','));
+    timesig.name = songlookup.split(':')[0];
     hideLib();
   }).catch(function(e){
     console.log('no song doc exists with that name   ' + songlookup,e);
@@ -799,6 +842,17 @@ function promptUserBeforeLeaving(){
 }
 function dontPromptUserBeforeLeaving(){
   window.onbeforeunload = null;
+}
+var firstdraw = true;
+function hideOverlay(){
+  firstdraw = false;
+  document.getElementById('hideonload').style.background = 'none';
+  document.getElementById('loadingIcon').remove();
+  test = false;
+  setTimeout(removeOverlay,1000);
+}
+function removeOverlay(){
+  document.getElementById('hideonload').remove();
 }
 function accCreatedCallback(){}
 function deleteAccCallback(){}
