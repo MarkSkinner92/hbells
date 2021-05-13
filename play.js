@@ -743,15 +743,18 @@ function openSongByQuery(songlookup){
     console.log('no song doc exists with that name   ' + songlookup,e);
   });
 }
+var _names;
 function genPublicThumbs(){
   var docRef = db.collection("Songlists").doc('list1');
   console.log('getting songlist 1... ' + docRef);
   docRef.get().then(function(doc) {
     currentUserDocData=doc.data();
     //loop through all songs and create thumbs
-    let names = currentUserDocData.data.split(',');
+    let longsongstring = currentUserDocData.data;
+    let names = longsongstring.split(',');
+    names.pop();
+    names.sort();
     for(let i = 0; i < names.length-1; i++){
-      console.log('creating elements');
       let g = names[i].split(':');
       var name = document.createElement("H1");
       name.innerHTML = g[0] + ', by ' + g[1] + '  (' + g[3] + ' bells)'; //names[i].split(':')[1] for public or private
@@ -808,7 +811,7 @@ function search(type,value){
         }
       }
       else if(type == 1){
-        if(parseInt(string.innerText.split('(')[1]) < numericValue){
+        if(parseInt(string.innerText.split('(')[1]) <= numericValue){
           eles[i].style.display = 'block';
         }else{
           eles[i].style.display = 'none'

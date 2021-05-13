@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <meta name="author" content="Mark Skinner">
   <meta name="description" content="Play handybell music from our library or from your computer with this easy-to-use graphical way of viewing handbell music. By following the dots moving across the screen, anyone with any musical ability can have a great time!">
   <meta name="keywords" content="handybells,8 note set,kid handbells,handbell,handbells,music,dots moving,handbell music visualized,lds handbell music">
@@ -171,8 +171,9 @@
             vertical-align:middle;
             border-radius: 8px;
             background-color: #185162;
-            width: 33%;
-            left: 33%;
+            width: max(33%,300px);
+            left: 50%;
+            transform: translateX(-50%);
             height: calc(100% - 150px);
             top: 100px;
             overflow:hidden;
@@ -217,7 +218,7 @@
   <img onclick="hideSignin(); hideLib(); hideAcctMenu(); showLogin(); showCorrectLib()" src = 'res/login.png' id="Login" style="position: absolute; z-index: 98; top: 10px; color: black; right:8px;">
   <img onclick="hideLogin(); hideLib(); hideAcctMenu(); showSignin()" src = 'res/signup.png' id="Signup" style="position: absolute; z-index: 98; top: 40px; color: black; right:8px;">
   <p id='welcome' style="position: absolute; z-index: 98; top: 65px; color: black; right:1px;">Not signed in</p>
-  <button id='acctmenubtn' onclick="showAcctMenu()" class="btn" style="display: none;position: absolute;z-index: 98;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
+  <button id='acctmenubtn' onclick="showAcctMenu()" class="btn" style="display: none;position: absolute;z-index: 0;top: 40px;color: #000;right: 105px;font-family: Arial;border: none;border-radius: 5px;height: 27px;background-color: #7edf27;">My Account</button>
   <div id = 'acctmenu' class='newsong' style="height:400px">
     <h1 class = "headertextlib">Account Settings</h1>
     <h3 style="display:none"id='songplayelement' class="headertextlib">You have 0 songplays left</h3>
@@ -236,7 +237,7 @@
     </div>
     <button onclick="hideDeleteAcctmenu();" class="buttonLib" style="position: absolute; bottom: 8px; left: 10px">Cancel</button>
   </div>
-  <div id="Logindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%; padding-bottom: 20px; background-color:#185162">
+  <div id="Logindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: max(50%,300px);left: 50%;transform: translateX(-50%); padding-bottom: 20px; background-color:#185162">
     <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px">Log in to Handybells</h1>
     <div class="container center">
       <label for="uname"><b class = "center">Email</b></label>
@@ -250,7 +251,7 @@
       <button id="loginenter" onclick="LogInAccount(); hideLogin();" class="formbutton btn">Login</button>
     </div>
   </div>
-  <div id="Signindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; left: 25%; width: 50%;padding-bottom: 0px;background-color:#185162">
+  <div id="Signindiv" style="position: absolute; display: none; color: #FFF; border-radius: 10px; top: 100px; width: max(50%,300px);left: 50%;transform: translateX(-50%);;padding-bottom: 0px;background-color:#185162">
     <h1 style="font-family: 'Manjari', sans-serif; text-align: center; font-size: 40px; margin-bottom:0px">Create Handybells Account</h1>
     <h3 id='error' style="font-family: 'Manjari', sans-serif; color:#FF5555; text-align: center; margin-top:0px"></h3>
     <div class="container center">
@@ -282,8 +283,8 @@
           <div class="entry public demo cloud" id="songthumb" style="display: block;"><h1 class="innertext">London Bridge (6 bells)</h1><h1 class="innertext"></h1></div>
         </div>
         <button onclick="hideLib()" class="buttonLib" style="position: absolute; bottom: 8px; right: 10px">Cancel</button>
-        <h3 id='privateMessage'class="" style="display:none;position: absolute;bottom: -4px;left: 10px;color: #2d98b9;">Private songs (highlighted) are only visible to you</h3>
-      <h2 id='message' style="position: absolute; bottom: -4px; left: 10px; font-size: 20px">Log in to see your songs, and the whole public library</h2>
+        <h3 id='privateMessage'class="" style="display:none;position: absolute;bottom: -4px;left: 10px;color: #2d98b9;font-size: 15px; width:200px">Private songs (highlighted) are only visible to you</h3>
+      <h2 id='message' style="position: absolute; bottom: -4px; left: 10px; font-size: 15px; width:200px">Log in to see your songs, and the whole public library</h2>
     </div>
     <img onclick="openSongStringURL()"class='topbutton' style='left: 925px;top: 36px;'src='res/sheetmusic.png'></img>
     <script src="https://code.createjs.com/1.0.0/soundjs.min.js"></script>
