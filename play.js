@@ -310,7 +310,9 @@ function StartNotesAt(bar, beat){
   if(bbl[bar] != undefined){
     if(bbl[bar][beat] != undefined){
       let c = bbl[bar][beat];
-      for(let i = 0; i < c.length; i++) staves[notetostaff[c[i]]].notes.unshift(-100);
+      for(let i = 0; i < c.length; i++){
+        staves[notetostaff[c[i]]]?.notes.unshift(-100);
+      }
     }
   }
 }
