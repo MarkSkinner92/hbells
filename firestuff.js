@@ -92,7 +92,7 @@ auth.onAuthStateChanged(function(user) {
       songplays = currentUserDocData.songplays;
       if(document.getElementById('songplayelement')){
         document.getElementById('songplayelement').style.display = 'unset';
-        document.getElementById('songplayelement').innerText = `You have ${songplays} song plays left`;
+        document.getElementById('songplayelement').innerText = `You have unlimited song plays left`;
       }
       //loop through all songs and create thumbs
       let names = currentUserDocData.data.split(',');
@@ -271,7 +271,8 @@ function decreaseSongplays(num){
     }).then(e => {
       songplays--;
       if(document.getElementById('songplayelement')){
-        document.getElementById('songplayelement').innerText = `You have ${songplays} song plays left`;
+        // document.getElementById('songplayelement').innerText = `You have ${songplays} song plays left`;
+          document.getElementById('songplayelement').innerText = `You have unlimited song plays left`;
       }
     });
   }
