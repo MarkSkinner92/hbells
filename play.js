@@ -442,15 +442,15 @@ function _play(){
   if(songinthehouse){
     if(!playback){
       //decrease the song count by 1
-      if(usr){
-        if(songplays > 0){
-          decreaseSongplays();
-        }
-        else{
-          showAcctMenu();
-          return;
-        }
-      }
+      // if(usr){
+      //   if(songplays > 0){
+      //     decreaseSongplays();
+      //   }
+      //   else{
+      //     showAcctMenu();
+      //     return;
+      //   }
+      // }
     }
     if(!paused){
       playback = true;
